@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>单词卡片 Demo</title>
+  <style>
+    :root{
+      --primary:#88B8E8;
+      --bg:#eff7ff;
+      --text:#2e3b48;
+      --muted:#6e7a86;
+      --card:#ffffff;
+      --shadow:0 8px 18px rgba(80,120,160,.16);
+      --radius:18px;
+    }
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+    html,body{margin:0;background:linear-gradient(180deg,#f8fcff,#edf6ff);font-family:"PingFang SC","Microsoft YaHei",sans-serif;color:var(--text);}
+    body{display:flex;justify-content:center;padding:10px;}
+    .app{
+      width:min(100%,430px);
+      min-height:calc(100vh - 20px);
+      background:var(--bg);
+      border-radius:26px;
+      overflow:hidden;
+      border:2px solid rgba(136,184,232,.45);
+      box-shadow:0 14px 28px rgba(70,110,150,.2);
+      position:relative;
+    }
+    .topbar{
+      padding:8px 12px 10px;
+      background:linear-gradient(180deg,#d5e8fb,#c7e0f9);
+      border-bottom:2px dashed rgba(46,59,72,.18);
+    }
+    .top-row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:6px;
+    }
+    .brand{font-weight:800;letter-spacing:.5px;font-size:14px;}
+    .content{padding:20px 12px 84px;}
+    .card{
+      background:var(--card);border-radius:var(--radius);padding:20px;border:2px solid rgba(136,184,232,.35);
+      box-shadow:var(--shadow);margin-bottom:20px;
+      text-align:center;
+    }
+    .title{margin:0 0 16px;font-size:18px;font-weight:800;}
+    .word{font-size:24px;font-weight:800;margin:20px 0;}
+    .meaning{font-size:16px;color:var(--muted);margin:10px 0 20px;}
+    .btn-container{
+      display:flex;
+      justify-content:space-between;
+      margin-top:30px;
+    }
+    .btn{
+      border:0;border-radius:12px;background:linear-gradient(180deg,#9dc8f0,#88B8E8);color:#fff;
+      font-weight:800;padding:12px 24px;box-shadow:0 8px 16px rgba(136,184,232,.36);cursor:pointer;transition:.12s transform,.12s filter;
+    }
+    .btn:disabled{
+      opacity:.5;
+      cursor:not-allowed;
+    }
+    .btn:active:not(:disabled){transform:scale(.96);filter:brightness(.96);}
+    .back-btn{
+      position:absolute;
+      top:12px;
+      left:12px;
+      background:#fff;border:0;border-radius:10px;padding:6px 12px;
+      font-weight:700;cursor:pointer;
+    }
+    .progress{
+      text-align:center;
+      margin:10px 0;
+      font-size:14px;
+      color:var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="app" id="app">
+    <div class="topbar">
+      <div class="top-row">
+        <div class="brand">📚 单词卡片</div>
+      </div>
+    </div>
+
+    <div class="content">
+      <button class="back-btn" onclick="window.location.href='index2.html'">返回</button>
+      
+      <div class="card">
+        <h2 class="title">单词背诵</h2>
+        <div class="progress" id="progress">1/10</div>
+        <div class="word" id="word">Hello</div>
+        <div class="meaning" id="meaning">你好</div>
+        <div class="btn-container">
+          <button class="btn" id="prevBtn" disabled>上一个</button>
+          <button class="btn" id="nextBtn">下一个</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const words = [
+      { word: "Hello", meaning: "你好" },
+      { word: "World", meaning: "世界" },
+      { word: "Apple", meaning: "苹果" },
+      { word: "Banana", meaning: "香蕉" },
+      { word: "Cat", meaning: "猫" },
+      { word: "Dog", meaning: "狗" },
+      { word: "Book", meaning: "书" },
+      { word: "Pen", meaning: "钢笔" },
+      { word: "Computer", meaning: "电脑" },
+      { word: "Phone", meaning: "手机" }
+    ];
+
+    let currentIndex = 0;
+
+    function updateWord() {
+      const wordElement = document.getElementById('word');
+      const meaningElement = document.getElementById('meaning');
+      const progressElement = document.getElementById('progress');
+      const prevBtn = document.getElementById('prevBtn');
+      const nextBtn = document.getElementById('nextBtn');
+
+      wordElement.textContent = words[currentIndex].word;
+      meaningElement.textContent = words[currentIndex].meaning;
+      progressElement.textContent = `${currentIndex + 1}/${words.length}`;
+
+      prevBtn.disabled = currentIndex === 0;
+      nextBtn.disabled = currentIndex === words.length - 1;
+    }
+
+    document.getElementById('prevBtn').onclick = () => {
+      if (currentIndex > 0) {
+        currentIndex--;
+        updateWord();
+      }
+    };
+
+    document.getElementById('nextBtn').onclick = () => {
+      if (currentIndex < words.length - 1) {
+        currentIndex++;
+        updateWord();
+      }
+    };
+
+    // 初始化
+    updateWord();
+  </script>
+</body>
+</html>

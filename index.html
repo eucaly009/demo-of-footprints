@@ -69,14 +69,15 @@
     .bar{height:11px;background:#dcebf9;border-radius:999px;overflow:hidden;border:1px solid rgba(46,59,72,.2);}
     .fill{height:100%;background:linear-gradient(90deg,#7cc895,#72b7ff);width:0%;transition:width .4s ease;}
     .scene{
-      height:310px;border-radius:20px;position:relative;overflow:hidden;
+      height:400px;border-radius:20px;position:relative;overflow:hidden;
       background:linear-gradient(180deg,#bfe4ff 0%,#d8edff 38%,#9ad08f 39%,#7ac36f 100%);
       border:2px solid rgba(136,184,232,.4);
       box-shadow:var(--shadow);
     }
     .sun{position:absolute;right:16px;top:20px;width:44px;height:44px;border-radius:50%;background:#ffe28c;box-shadow:0 0 0 6px rgba(255,226,140,.28);}
     .cloud{position:absolute;background:#fff;border-radius:20px;height:18px;width:58px;opacity:.9;}
-    .cloud:before,.cloud:after{content:"";position:absolute;background:#fff;border-radius:50%;}
+    .cloud:before,.cloud:after{content:"";
+    position:absolute;background:#fff;border-radius:50%;}
     .cloud:before{width:20px;height:20px;left:8px;top:-8px;}
     .cloud:after{width:24px;height:24px;right:8px;top:-11px;}
     .flowers{
@@ -367,6 +368,14 @@
       opacity:1;
       transform:translateX(-50%) translateY(-4px);
     }
+    .tooltip-container{position:relative;display:inline-block;}
+    .tooltip{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:rgba(38,54,72,.92);color:#fff;font-size:11px;padding:6px 8px;border-radius:8px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .2s ease;z-index:100;margin-bottom:4px;}
+    .tooltip-container:hover .tooltip{opacity:1;}
+    .uid-row{display:flex;align-items:center;gap:8px;grid-column:1/3;}
+    .uid-copy-btn{background:none;border:none;font-size:14px;cursor:pointer;color:#88B8E8;}
+    .task-progress-bar{margin:10px 0 10px;position:relative;}
+    .task-progress-bar .bar{margin-top:8px;}
+    .task-progress-icon{position:absolute;top:-6px;left:0;transform:translateX(-50%);background:#fff;border:2px solid #88B8E8;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:12px;}
   </style>
 </head>
 <body>
@@ -390,7 +399,7 @@
             <div class="chip" id="xpChip">Lv.3 · 120/200</div>
           </div>
           <div class="home-side-actions">
-            <button class="home-action" data-home-action="bag"><div class="i">🎒</div>背包</button>
+            <button class="home-action" data-home-action="vocab"><div class="i">📚</div>单词</button>
             <button class="home-action" data-home-action="friend"><div class="i">👫</div>好友</button>
             <button class="home-action" data-home-action="wardrobe"><div class="i">👗</div>衣柜</button>
             <button class="home-action" data-home-action="scene"><div class="i">🌄</div>场景</button>
@@ -403,12 +412,8 @@
         </div>
         <div class="home-bottom">
           <div class="card">
-            <div style="display:flex;justify-content:space-between;align-items:center;">
-              <h3 class="title" style="margin:0;">今日成长状态</h3>
-              <span class="tiny" id="xpText">120/200</span>
-            </div>
-            <div class="bar" style="margin-top:6px;"><div class="fill" id="xpBar"></div></div>
-            <p class="tiny" style="margin:8px 0 0;">晴天白天，花海风吹得刚刚好，继续冲刺吧。</p>
+            <h3 class="title" style="margin:0;">今日运势</h3>
+            <p class="tiny" style="margin:8px 0 0;">今天是充满活力的一天，你的努力将收获回报。保持积极的心态，每一步都在靠近目标。记得适当休息，平衡工作与生活，你会发现更多美好。</p>
           </div>
           <button class="btn" id="focusBtn">进入自律时钟（30分钟）</button>
         </div>
@@ -417,9 +422,24 @@
       <section class="page" id="taskPage">
         <div class="card">
           <div class="task-head">
-            <h3 class="title" style="margin:0;">系统自动检测任务</h3>
-            <button class="mini-btn" id="editToggleBtn">编辑</button>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <h3 class="title" style="margin:0;">每日任务</h3>
+              <div class="tooltip-container">
+                <span style="color:#999;font-size:14px;cursor:help;">?</span>
+                <div class="tooltip">系统自动检测是否完成，达成2/4个后可参与碎片抽奖。</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:8px;">
+              <button class="mini-btn" id="addTaskBtn">添加任务</button>
+              <button class="mini-btn" id="editToggleBtn">编辑</button>
+            </div>
           </div>
+          
+          <div class="task-progress-bar">
+            <div class="task-progress-icon" id="progressIcon">🎁</div>
+            <div class="bar" id="taskProgressBar"><div class="fill" style="width:0%"></div></div>
+          </div>
+          
           <div id="systemTaskList"></div>
 
           <div class="reward-row">
@@ -439,7 +459,7 @@
           <div id="editPanel" class="hidden">
             <div class="edit-tools">
               <input id="newTaskInput" class="input" placeholder="输入新任务名称，例如：背诵20分钟" />
-              <button class="mini-btn" id="addTaskBtn">添加</button>
+              <button class="mini-btn" id="addCustomTaskBtn">添加</button>
             </div>
           </div>
           <div id="customTaskList"></div>
@@ -466,17 +486,39 @@
       <section class="page" id="calendarPage">
         <div class="card">
           <h3 class="title">月视图日历</h3>
-          <p class="tiny" id="monthLabel"></p>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <button class="mini-btn" id="prevYearBtn">◀ 年</button>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <select id="yearSelect" class="input" style="width:80px;"></select>
+              <span>年</span>
+              <select id="monthSelect" class="input" style="width:60px;"></select>
+              <span>月</span>
+            </div>
+            <button class="mini-btn" id="nextYearBtn">年 ▶</button>
+          </div>
           <div class="week"><div>日</div><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div></div>
           <div class="calendar-grid" id="calendarGrid"></div>
           <p class="tiny" id="streakText">连续打卡：0天</p>
+          <p class="tiny" style="margin-top:8px;">如何获得打卡标记：每日完成任务解锁花瓣，累计5个解锁五色花瓣，累计7个解锁小彩虹。</p>
         </div>
         <div class="card">
-          <h3 class="title">今日事项</h3>
-          <div style="display:flex;gap:8px;">
+          <h3 class="title" id="eventTitle">今日事项</h3>
+          <div style="display:flex;gap:8px; margin-bottom:8px;">
+            <select id="eventIconSelect" class="input" style="width:80px;">
+              <option value="📝">📝</option>
+              <option value="⏰">⏰</option>
+              <option value="📅">📅</option>
+              <option value="💡">💡</option>
+              <option value="🎯">🎯</option>
+              <option value="📚">📚</option>
+              <option value="🏃">🏃</option>
+              <option value="💪">💪</option>
+            </select>
             <input id="eventInput" class="input" placeholder="添加今日事项..." />
+            <input type="time" id="eventTimeInput" class="input" style="width:100px;" />
             <button id="eventAddBtn" class="mini-btn">添加</button>
           </div>
+          <p class="tiny" style="margin:4px 0;">提示：将在设定时间发送提醒</p>
           <div id="eventList" style="margin-top:8px;"></div>
         </div>
       </section>
@@ -485,10 +527,14 @@
         <div class="card">
           <h3 class="title">资料编辑</h3>
           <div class="profile-form">
-            <input id="profileNickname" class="input full" placeholder="昵称" />
-            <input id="profileGender" class="input" placeholder="性别" />
-            <input id="profileBirthday" class="input" placeholder="生日（例：2000-01-01）" />
-            <input id="profileMbti" class="input full" placeholder="MBTI（例：ENFP）" />
+            <div class="uid-row">
+              <input id="profileUid" class="input" placeholder="UID" value="100861398" readonly />
+              <button class="uid-copy-btn" id="copyUidBtn">📋</button>
+            </div>
+            <input id="profileNickname" class="input full" placeholder="昵称" value="Viya" />
+            <input id="profileGender" class="input" placeholder="性别" value="女" />
+            <input id="profileBirthday" class="input" placeholder="生日（例：2000-01-01）" value="2004.06.01" />
+            <input id="profileMbti" class="input full" placeholder="MBTI（例：ENFP）" value="INFP" />
           </div>
           <button class="mini-btn" id="saveProfileBtn" style="margin-top:8px;">保存资料</button>
         </div>
@@ -536,7 +582,7 @@
         <button class="mini-btn" id="friendCloseBtn">关闭</button>
       </div>
       <div style="display:flex;gap:8px;">
-        <input id="friendNameInput" class="input" placeholder="输入好友昵称" />
+        <input id="friendNameInput" class="input" placeholder="输入ID" />
         <button class="mini-btn" id="addFriendBtn">添加</button>
       </div>
       <p class="tiny" id="friendStats" style="margin-top:8px;"></p>
@@ -564,7 +610,27 @@
       <div class="modal">
         <h4 id="modalTitle">提示</h4>
         <p id="modalDesc"></p>
-        <button class="btn" id="modalOkBtn">知道啦</button>
+        <div style="display:flex;gap:8px; margin-top:10px;">
+          <button class="btn" style="flex:1;" id="modalOkBtn">确认</button>
+          <button class="btn" style="flex:1; background: #e0e0e0; color: #333;" id="modalCancelBtn">取消</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-mask" id="taskLibraryModal">
+      <div class="modal" style="width:90%; max-width:400px;">
+        <h4 id="taskLibraryTitle">任务库</h4>
+        <div class="seg" style="margin:10px 0;">
+          <button class="task-library-tab active" data-category="热门">热门</button>
+          <button class="task-library-tab" data-category="健身">健身</button>
+          <button class="task-library-tab" data-category="减肥">减肥</button>
+          <button class="task-library-tab" data-category="背单词">背单词</button>
+          <button class="task-library-tab" data-category="考研">考研</button>
+          <button class="task-library-tab" data-category="考公">考公</button>
+        </div>
+        <div id="taskLibraryContent" style="max-height:300px; overflow-y:auto; margin-bottom:10px;"></div>
+        <div style="display:flex;gap:8px; margin-top:10px;">
+          <button class="btn" style="flex:1;" id="taskLibraryCloseBtn">关闭</button>
+        </div>
       </div>
     </div>
     <div class="toast" id="toast"></div>
@@ -573,7 +639,7 @@
   <script>
     const state = {
       user:{ name:"viya", level:3, xp:120, xpMax:200, shards:6, weather:"晴天·白天", outfit:"蓝色裙子", scene:"花海" },
-      profile:{ nickname:"viya", gender:"女", birthday:"2000-01-01", mbti:"ENFP" },
+      profile:{ nickname:"Viya", gender:"女", birthday:"2004.06.01", mbti:"INFP" },
       social:{ visits:0 },
       friends:[
         { id:1, nickname:"A朋友", gender:"女", birthday:"03-09", mbti:"INFP", level:5, achievements:["晨跑达人","早睡守护者"], wardrobe:"星空斗篷", scene:"海边晨光" },
@@ -582,7 +648,7 @@
       firstGiftShown:false,
       systemTasks:[
         {id:"gre",name:"学习GRE单词100个",current:0,total:100,done:false,type:"progress"},
-        {id:"steps",name:"运动步数5000步",current:2800,total:5000,done:false,type:"progress",tip:"快完成了，加油"},
+        {id:"steps",name:"运动步数5000步",current:2800,total:5000,done:false,type:"progress",tip:"还差一点点！继续加油！"},
         {id:"sleep",name:"12点前睡觉",status:"今日未完成",done:false,type:"status",special:"pink",streak:"已坚持25天，不要断签哦"},
         {id:"bili",name:"完成B站跟练视频",status:"待跟练",done:false,type:"link",special:"orange",streak:"已坚持25天，不要断签哦"}
       ],
@@ -612,6 +678,53 @@
         {id:"a9",name:"节日策划师",desc:"参与3次特定活动主题任务",icon:"🎉",unlocked:false,condition:"参与3次特定活动",source:"event"},
         {id:"a10",name:"花海摄影师",desc:"解锁并使用3种场景皮肤",icon:"📸",unlocked:false,condition:"解锁并使用3种场景",source:"event"}
       ],
+      taskLibrary:{
+        currentCategory:"热门",
+        categories:["用过","热门","健身","减肥","背单词","考研","考公"],
+        tasks:{
+          "用过":[
+            {id:"used1",name:"学习GRE单词100个",type:"progress",total:100},
+            {id:"used2",name:"运动步数5000步",type:"progress",total:5000},
+            {id:"used3",name:"12点前睡觉",type:"status"}
+          ],
+          "热门":[
+            {id:"hot1",name:"每日阅读30分钟",type:"progress",total:30},
+            {id:"hot2",name:"冥想10分钟",type:"status"},
+            {id:"hot3",name:"喝水2000ml",type:"progress",total:2000},
+            {id:"hot4",name:"写日记",type:"status"}
+          ],
+          "健身":[
+            {id:"fit1",name:"晨跑30分钟",type:"progress",total:30},
+            {id:"fit2",name:"力量训练45分钟",type:"progress",total:45},
+            {id:"fit3",name:"瑜伽20分钟",type:"progress",total:20},
+            {id:"fit4",name:"拉伸放松15分钟",type:"progress",total:15}
+          ],
+          "减肥":[
+            {id:"weight1",name:"控制饮食",type:"status"},
+            {id:"weight2",name:"有氧运动40分钟",type:"progress",total:40},
+            {id:"weight3",name:"记录体重",type:"status"},
+            {id:"weight4",name:"不吃零食",type:"status"}
+          ],
+          "背单词":[
+            {id:"word1",name:"背单词50个",type:"progress",total:50},
+            {id:"word2",name:"复习单词100个",type:"progress",total:100},
+            {id:"word3",name:"单词测试",type:"status"},
+            {id:"word4",name:"听力练习30分钟",type:"progress",total:30}
+          ],
+          "考研":[
+            {id:"kaoyan1",name:"政治复习2小时",type:"progress",total:120},
+            {id:"kaoyan2",name:"英语阅读4篇",type:"progress",total:4},
+            {id:"kaoyan3",name:"专业课复习3小时",type:"progress",total:180},
+            {id:"kaoyan4",name:"真题模拟",type:"status"}
+          ],
+          "考公":[
+            {id:"kaogong1",name:"行测练习100题",type:"progress",total:100},
+            {id:"kaogong2",name:"申论写作",type:"status"},
+            {id:"kaogong3",name:"时政积累",type:"status"},
+            {id:"kaogong4",name:"面试练习",type:"status"}
+          ]
+        }
+      },
       calendarChecks:new Set(),
       events:[],
       bag:{
@@ -648,12 +761,12 @@
     };
 
     const $ = (id) => document.getElementById(id);
-    const pages = { home:$("homePage"), task:$("taskPage"), calendar:$("calendarPage"), profile:$("profilePage") };
+    const pages = { home:$('homePage'), task:$('taskPage'), calendar:$('calendarPage'), profile:$('profilePage') };
 
     function drawPixelGirl(canvasId, mode="stand"){
       const canvas = $(canvasId);
       if(!canvas) return;
-      const ctx = canvas.getContext("2d");
+      const ctx = canvas.getContext('2d');
       ctx.imageSmoothingEnabled = false;
 
       const P = {
@@ -753,21 +866,44 @@
       for(let y=156;y<165;y++){ for(let x=118;x<138;x++) px(x,y,1,1,P.skin); }
     }
 
-    function openModal(title,desc,okText="知道啦"){
-      $("modalTitle").textContent=title;
-      $("modalDesc").textContent=desc;
-      $("modalOkBtn").textContent=okText;
-      $("modalMask").classList.add("show");
+    function openModal(title,desc,okText="知道啦", showCancel=false, onOk, onCancel){
+      $('modalTitle').textContent=title;
+      $('modalDesc').textContent=desc;
+      $('modalOkBtn').textContent=okText;
+      $('modalCancelBtn').style.display=showCancel ? 'block' : 'none';
+      $('modalMask').classList.add('show');
+      
+      const originalOk = $('modalOkBtn').onclick;
+      const originalCancel = $('modalCancelBtn').onclick;
+      
+      if(onOk){
+        $('modalOkBtn').onclick=()=>{
+          onOk();
+          closeModal();
+          $('modalOkBtn').onclick=originalOk;
+          $('modalCancelBtn').onclick=originalCancel;
+        };
+      }
+      
+      if(onCancel){
+        $('modalCancelBtn').onclick=()=>{
+          onCancel();
+          closeModal();
+          $('modalOkBtn').onclick=originalOk;
+          $('modalCancelBtn').onclick=originalCancel;
+        };
+      }
     }
-    function closeModal(){ $("modalMask").classList.remove("show"); }
-    $("modalOkBtn").onclick=closeModal;
-    $("modalMask").onclick=(e)=>{ if(e.target.id==="modalMask") closeModal(); };
+    function closeModal(){ $('modalMask').classList.remove('show'); }
+    $('modalOkBtn').onclick=closeModal;
+    $('modalCancelBtn').onclick=closeModal;
+    $('modalMask').onclick=(e)=>{ if(e.target.id==='modalMask') closeModal(); };
     function showToast(text){
-      const t = $("toast");
+      const t = $('toast');
       t.textContent = text;
-      t.classList.add("show");
+      t.classList.add('show');
       clearTimeout(showToast._timer);
-      showToast._timer = setTimeout(()=>t.classList.remove("show"), 1500);
+      showToast._timer = setTimeout(()=>t.classList.remove('show'), 1500);
     }
 
     function gainXp(v){
@@ -781,12 +917,12 @@
 
     function renderUser(){
       const p = Math.max(0,Math.min(100,(state.user.xp/state.user.xpMax)*100));
-      $("xpBar").style.width = p + "%";
-      $("topXpBar").style.width = p + "%";
-      $("xpText").textContent = `${state.user.xp}/${state.user.xpMax}`;
-      $("xpChip").textContent = `Lv.${state.user.level} · ${state.user.xp}/${state.user.xpMax}`;
-      $("topLevelText").textContent = `Lv.${state.user.level} · ${state.user.xp}/${state.user.xpMax}`;
-      $("weatherChip").textContent = `☀️ ${state.user.weather}`;
+      $('xpBar').style.width = p + '%';
+      $('topXpBar').style.width = p + '%';
+      $('xpText').textContent = `${state.user.xp}/${state.user.xpMax}`;
+      $('xpChip').textContent = `Lv.${state.user.level} · ${state.user.xp}/${state.user.xpMax}`;
+      $('topLevelText').textContent = `Lv.${state.user.level} · ${state.user.xp}/${state.user.xpMax}`;
+      $('weatherChip').textContent = `☀️ ${state.user.weather}`;
     }
 
     function updateSocialAchievements(){
@@ -797,11 +933,22 @@
     }
 
     function switchPage(key){
-      Object.values(pages).forEach(p=>p.classList.remove("active"));
-      pages[key].classList.add("active");
-      document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("active",t.dataset.page===key));
+        Object.values(pages).forEach(p=>p.classList.remove('active'));
+        pages[key].classList.add('active');
+        document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.page===key));
+        
+        // 页面切换时重新渲染内容
+        if(key === 'task'){
+            renderSystemTasks();
+            renderCustomTasks();
+            renderTaskAchievementLink();
+        } else if(key === 'calendar'){
+            renderCalendar();
+        } else if(key === 'profile'){
+            renderProfileAchievements();
+        }
     }
-    document.querySelectorAll(".tab").forEach(tab=>tab.onclick=()=>switchPage(tab.dataset.page));
+    document.querySelectorAll('.tab').forEach(tab=>tab.onclick=()=>switchPage(tab.dataset.page));
 
     function systemDoneCount(){ return state.systemTasks.filter(t=>t.done).length; }
 
@@ -809,12 +956,29 @@
       const done = systemDoneCount();
       const smallOn = done >= 2 && !state.smallGiftClaimed;
       const bigOn = done >= 4 && !state.bigGiftClaimed;
-      $("smallGift").classList.toggle("on",smallOn);
-      $("bigGift").classList.toggle("on",bigOn);
-      $("smallGiftBtn").disabled=!smallOn;
-      $("bigGiftBtn").disabled=!bigOn;
-      $("smallGiftBtn").textContent = state.smallGiftClaimed ? "已领取" : smallOn ? "领取奖励" : "未点亮";
-      $("bigGiftBtn").textContent = state.bigGiftClaimed ? "已领取" : bigOn ? "领取奖励" : "未点亮";
+      
+      // 更新进度条
+      const progress = (done / state.systemTasks.length) * 100;
+      $('taskProgressBar').querySelector('.fill').style.width = progress + '%';
+      
+      // 更新进度图标
+      if(done >= 4){
+        $('progressIcon').textContent = '🎁';
+        $('progressIcon').style.left = '100%';
+      } else if(done >= 2){
+        $('progressIcon').textContent = '🎁';
+        $('progressIcon').style.left = '50%';
+      } else {
+        $('progressIcon').textContent = '🎁';
+        $('progressIcon').style.left = '0%';
+      }
+      
+      $('smallGift').classList.toggle('on',smallOn);
+      $('bigGift').classList.toggle('on',bigOn);
+      $('smallGiftBtn').disabled=!smallOn;
+      $('bigGiftBtn').disabled=!bigOn;
+      $('smallGiftBtn').textContent = state.smallGiftClaimed ? '已领取' : smallOn ? '领取奖励' : '未点亮';
+      $('bigGiftBtn').textContent = state.bigGiftClaimed ? '已领取' : bigOn ? '领取奖励' : '未点亮';
     }
 
     function rewardClaim(type){
@@ -826,31 +990,47 @@
       gainXp(exp);
       updateRewardState();
       renderBag();
-      openModal("礼盒奖励到账",`经验 +${exp}\n皮肤碎片 +${frag}`);
+      openModal('礼盒奖励到账',`经验 +${exp}\n皮肤碎片 +${frag}`);
     }
 
-    $("smallGiftBtn").onclick=()=>{ if(!$("smallGiftBtn").disabled) rewardClaim("small"); };
-    $("bigGiftBtn").onclick=()=>{ if(!$("bigGiftBtn").disabled) rewardClaim("big"); };
+    $('smallGiftBtn').onclick=()=>{ 
+      if($('smallGiftBtn').disabled){
+        openModal('奖励预览', '随机服装碎片*3-5个');
+      } else {
+        rewardClaim('small');
+      }
+    };
+    $('bigGiftBtn').onclick=()=>{ 
+      if($('bigGiftBtn').disabled){
+        openModal('奖励预览', '随机服装碎片*3-5个');
+      } else {
+        rewardClaim('big');
+      }
+    };
 
     function renderSystemTasks(){
-      const box = $("systemTaskList");
-      box.innerHTML = "";
+      const box = $('systemTaskList');
+      box.innerHTML = '';
       state.systemTasks.forEach(task=>{
-        const div = document.createElement("div");
-        let cls = "task-item";
-        if(task.special==="orange") cls += " special-orange";
-        if(task.special==="pink") cls += " special-pink";
+        const div = document.createElement('div');
+        let cls = 'task-item';
+        if(task.special==='orange') cls += ' special-orange';
+        if(task.special==='pink') cls += ' special-pink';
         div.className = cls;
 
-        let rightPart = "";
-        let progressLine = "";
+        let rightPart = '';
+        let progressLine = '';
 
-        if(task.type==="progress"){
+        if(task.type==='progress'){
           const pct = Math.min(100,(task.current/task.total)*100);
           progressLine = `<div class="tiny" style="margin:6px 0 4px;">${task.current}/${task.total}</div>
                           <div class="bar"><div class="fill" style="width:${pct}%;"></div></div>`;
           if(task.tip) progressLine += `<div class="task-sub">${task.tip}</div>`;
-        } else if(task.type==="status"){
+          // 为GRE单词任务添加去背诵按钮
+          if(task.id === 'gre') {
+            rightPart = `<button class="mini-btn" data-vocab="${task.id}">去背诵</button>`;
+          }
+        } else if(task.type==='status'){
           progressLine = `<div class="tiny" style="margin-top:6px;">${task.status}</div>`;
         } else {
           rightPart = `<button class="mini-btn" data-go="${task.id}">去跟练</button>`;
@@ -858,56 +1038,66 @@
         }
 
         if(task.streak){
-          progressLine += `<div class="task-sub ${task.special==="pink"?"pink":""}">${task.streak}</div>`;
+          progressLine += `<div class="task-sub ${task.special==='pink'?'pink':''}">${task.streak}</div>`;
         }
 
         div.innerHTML = `
           <div class="task-row">
-            <div class="system-check ${task.done?"done":""}" data-sys="${task.id}">${task.done?"✓":""}</div>
+            <div class="system-check ${task.done?'done':''}" data-sys="${task.id}">${task.done?'✓':''}</div>
             <div class="task-name">${task.name}</div>
             ${rightPart}
+            ${state.editMode ? `<button class="mini-btn" data-del="${task.id}">删除</button>` : ''}
           </div>
           ${progressLine}
         `;
         box.appendChild(div);
       });
 
-      box.querySelectorAll("[data-go]").forEach(btn=>{
+      box.querySelectorAll('[data-go]').forEach(btn=>{
         btn.onclick=()=>{
-          openModal("Demo跳转", "已跳转到跟练Demo页（模拟）");
-          const t = state.systemTasks.find(i=>i.id==="bili");
-          t.status = "已完成";
+          openModal('Demo跳转', '已跳转到跟练Demo页（模拟）');
+          const t = state.systemTasks.find(i=>i.id==='bili');
+          t.status = '已完成';
           t.done = true;
           renderSystemTasks();
         };
       });
-      box.querySelectorAll("[data-sys]").forEach(check=>{
+      
+      box.querySelectorAll('[data-vocab]').forEach(btn=>{
+        btn.onclick=()=>{
+          // 跳转到单词卡片Demo页
+          window.location.href = 'vocab.html';
+        };
+      });
+      box.querySelectorAll('[data-sys]').forEach(check=>{
         check.onclick=()=>{
-          const id = check.dataset.sys;
-          const t = state.systemTasks.find(i=>i.id===id);
-          t.done = !t.done;
-          if(t.type==="status") t.status = t.done ? "今日已完成" : "今日未完成";
-          if(t.type==="progress" && t.done) t.current = t.total;
-          if(t.type==="progress" && !t.done && t.id==="gre") t.current = 0;
-          if(t.type==="progress" && !t.done && t.id==="steps") t.current = 2800;
-          renderSystemTasks();
+          showToast('该任务由系统检测，无法手动完成');
+        };
+      });
+      box.querySelectorAll('[data-del]').forEach(b=>{
+        b.onclick=()=>{
+          const id = b.dataset.del;
+          openModal('确认删除', '是否确认删除该每日任务？', '确认', true, ()=>{
+            state.systemTasks = state.systemTasks.filter(i=>i.id!==id);
+            renderSystemTasks();
+          });
         };
       });
       updateRewardState();
     }
 
     function renderCustomTasks(){
-      const box = $("customTaskList");
-      box.innerHTML = "";
+      const box = $('customTaskList');
+      box.innerHTML = '';
       state.customTasks.forEach(task=>{
-        const row = document.createElement("div");
-        row.className = "task-item";
+        const row = document.createElement('div');
+        row.className = 'task-item';
         row.innerHTML = `
           <div class="custom-row">
-            <div class="custom-check ${task.done?"done":""}" data-custom="${task.id}">${task.done?"✓":""}</div>
+            <div class="custom-check ${task.done?'done':''}" data-custom="${task.id}">${task.done?'✓':''}</div>
             <div class="task-name">${task.name}</div>
             <div class="tiny">+${task.exp}经验</div>
-            ${state.editMode ? `<button class="mini-btn" data-del="${task.id}">删除</button>` : ""}
+            ${state.editMode ? `<button class="mini-btn" data-del="${task.id}">删除</button>` : ''}
           </div>
           <div class="tiny" style="margin:6px 0 4px;">进度 ${task.progress}%</div>
           <div class="bar"><div class="fill" style="width:${task.progress}%"></div></div>
@@ -915,7 +1105,7 @@
         box.appendChild(row);
       });
 
-      box.querySelectorAll("[data-custom]").forEach(c=>{
+      box.querySelectorAll('[data-custom]').forEach(c=>{
         c.onclick=()=>{
           const id = Number(c.dataset.custom);
           const t = state.customTasks.find(i=>i.id===id);
@@ -926,7 +1116,7 @@
         };
       });
 
-      box.querySelectorAll("[data-del]").forEach(b=>{
+      box.querySelectorAll('[data-del]').forEach(b=>{
         b.onclick=()=>{
           const id = Number(b.dataset.del);
           state.customTasks = state.customTasks.filter(i=>i.id!==id);
@@ -935,24 +1125,99 @@
       });
     }
 
-    $("editToggleBtn").onclick=()=>{
+    $('editToggleBtn').onclick=()=>{
       state.editMode = !state.editMode;
-      $("editPanel").classList.toggle("hidden", !state.editMode);
-      $("editToggleBtn").textContent = state.editMode ? "完成编辑" : "编辑";
+      $('editPanel').classList.toggle('hidden', !state.editMode);
+      $('editToggleBtn').textContent = state.editMode ? '完成编辑' : '编辑';
+      renderSystemTasks();
       renderCustomTasks();
     };
-    $("addTaskBtn").onclick=()=>{
-      const text = $("newTaskInput").value.trim();
+    
+    // 打开任务库
+    $('addTaskBtn').onclick=()=>{
+      renderTaskLibrary();
+      $('taskLibraryModal').classList.add('show');
+    };
+    
+    // 关闭任务库
+    $('taskLibraryCloseBtn').onclick=()=>{
+      $('taskLibraryModal').classList.remove('show');
+    };
+    
+    // 任务库分类切换
+    document.querySelectorAll('.task-library-tab').forEach(tab=>{
+      tab.onclick=()=>{
+        document.querySelectorAll('.task-library-tab').forEach(t=>t.classList.remove('active'));
+        tab.classList.add('active');
+        state.taskLibrary.currentCategory = tab.dataset.category;
+        renderTaskLibrary();
+      };
+    });
+    
+    // 自定义任务添加
+    $('addCustomTaskBtn').onclick=()=>{
+      const text = $('newTaskInput').value.trim();
       if(!text) return;
       state.customTasks.push({id:Date.now(),name:text,progress:0,done:false,exp:5});
-      $("newTaskInput").value = "";
+      $('newTaskInput').value = '';
       renderCustomTasks();
     };
+    
+    // 渲染任务库
+    function renderTaskLibrary(){
+      const content = $('taskLibraryContent');
+      content.innerHTML = '';
+      const tasks = state.taskLibrary.tasks[state.taskLibrary.currentCategory] || [];
+      
+      tasks.forEach(task=>{
+        const div = document.createElement('div');
+        div.className = 'task-item';
+        div.innerHTML = `
+          <div class="task-row">
+            <div class="task-name">${task.name}</div>
+            <button class="mini-btn" data-add-task="${task.id}">添加</button>
+          </div>
+        `;
+        content.appendChild(div);
+      });
+      
+      // 添加任务到每日任务
+      content.querySelectorAll('[data-add-task]').forEach(btn=>{
+        btn.onclick=()=>{
+          const taskId = btn.dataset.addTask;
+          const task = state.taskLibrary.tasks[state.taskLibrary.currentCategory].find(t=>t.id===taskId);
+          
+          if(task){
+            // 检查任务是否已存在
+            const exists = state.systemTasks.some(t=>t.name===task.name);
+            if(exists){
+              showToast('该任务已存在');
+              return;
+            }
+            
+            // 添加到系统任务
+            const newTask = {
+              id:Date.now().toString(),
+              name:task.name,
+              current:0,
+              total:task.total || 0,
+              done:false,
+              type:task.type
+            };
+            
+            state.systemTasks.push(newTask);
+            renderSystemTasks();
+            showToast('任务添加成功');
+            $('taskLibraryModal').classList.remove('show');
+          }
+        };
+      });
+    }
 
     function renderTaskAchievementLink(){
-      const box = $("taskAchGrid");
-      box.innerHTML = "";
-      const isUndone = state.achUi.taskTab === "undone";
+      const box = $('taskAchGrid');
+      box.innerHTML = '';
+      const isUndone = state.achUi.taskTab === 'undone';
       const list = state.achievements.filter(a=>isUndone ? !a.unlocked : a.unlocked);
       const pageSize = state.achUi.pageSize;
       const totalPages = Math.max(1, Math.ceil(list.length / pageSize));
@@ -960,26 +1225,26 @@
       const start = state.achUi.taskPage * pageSize;
       const pageItems = list.slice(start, start + pageSize);
 
-      $("taskAchTabUn").classList.toggle("active", isUndone);
-      $("taskAchTabDone").classList.toggle("active", !isUndone);
-      $("taskAchPageInfo").textContent = `${state.achUi.taskPage + 1}/${totalPages}`;
-      $("taskAchPrev").disabled = state.achUi.taskPage <= 0;
-      $("taskAchNext").disabled = state.achUi.taskPage >= totalPages - 1;
+      $('taskAchTabUn').classList.toggle('active', isUndone);
+      $('taskAchTabDone').classList.toggle('active', !isUndone);
+      $('taskAchPageInfo').textContent = `${state.achUi.taskPage + 1}/${totalPages}`;
+      $('taskAchPrev').disabled = state.achUi.taskPage <= 0;
+      $('taskAchNext').disabled = state.achUi.taskPage >= totalPages - 1;
 
       pageItems.forEach(a=>{
-        const d = document.createElement("div");
-        d.className = "ach-item" + (a.unlocked ? "" : " locked");
-        d.innerHTML = `<div class="ach-icon">${a.unlocked ? a.icon : "🔒"}</div><div class="tiny">${a.name}</div>`;
+        const d = document.createElement('div');
+        d.className = 'ach-item' + (a.unlocked ? '' : ' locked');
+        d.innerHTML = `<div class="ach-icon">${a.unlocked ? a.icon : '🔒'}</div><div class="tiny">${a.name}</div>`;
         d.onclick=()=>{
           if(a.unlocked){
-            openModal("已解锁成就", `${a.name}\n${a.desc}`);
+            openModal('已解锁成就', `${a.name}\n${a.desc}`);
           }else{
-            openModal("未解锁成就", `达成条件：${a.condition}\n\n点击“添加”将条件任务加入自定义任务`, "一键添加");
-            $("modalOkBtn").onclick=()=>{
+            openModal('未解锁成就', `达成条件：${a.condition}\n\n点击"添加"将条件任务加入自定义任务`, '一键添加');
+            $('modalOkBtn').onclick=()=>{
               closeModal();
               state.customTasks.push({id:Date.now(),name:`[成就] ${a.condition}`,progress:0,done:false,exp:8});
               renderCustomTasks();
-              $("modalOkBtn").onclick=defaultModalOk;
+              $('modalOkBtn').onclick=defaultModalOk;
             };
           }
         };
@@ -991,8 +1256,8 @@
     }
 
     function renderProfileAchievements(){
-      const box = $("profileAchGrid");
-      box.innerHTML = "";
+      const box = $('profileAchGrid');
+      box.innerHTML = '';
       const currentType = state.achUi.profileTab;
       const list = state.achievements.filter(a=>a.source===currentType);
       const pageSize = state.achUi.pageSize;
@@ -1001,25 +1266,25 @@
       const start = state.achUi.profilePage * pageSize;
       const pageItems = list.slice(start, start + pageSize);
 
-      $("profileAchTabTask").classList.toggle("active", currentType==="task");
-      $("profileAchTabEvent").classList.toggle("active", currentType==="event");
-      $("profileAchPageInfo").textContent = `${state.achUi.profilePage + 1}/${totalPages}`;
-      $("profileAchPrev").disabled = state.achUi.profilePage <= 0;
-      $("profileAchNext").disabled = state.achUi.profilePage >= totalPages - 1;
+      $('profileAchTabTask').classList.toggle('active', currentType==='task');
+      $('profileAchTabEvent').classList.toggle('active', currentType==='event');
+      $('profileAchPageInfo').textContent = `${state.achUi.profilePage + 1}/${totalPages}`;
+      $('profileAchPrev').disabled = state.achUi.profilePage <= 0;
+      $('profileAchNext').disabled = state.achUi.profilePage >= totalPages - 1;
 
       pageItems.forEach(a=>{
-        const d = document.createElement("div");
-        d.className = "ach-item" + (a.unlocked ? "" : " locked");
+        const d = document.createElement('div');
+        d.className = 'ach-item' + (a.unlocked ? '' : ' locked');
         d.innerHTML = `
-          <div class="ach-icon">${a.unlocked ? a.icon : "🔒"}</div>
+          <div class="ach-icon">${a.unlocked ? a.icon : '🔒'}</div>
           <div style="font-size:12px;font-weight:700;">${a.name}</div>
           <div class="tiny">${a.desc}</div>
         `;
         d.onclick=()=>{
           if(a.unlocked){
-            openModal("分享卡片已生成", `【${a.name}】\n准备分享到朋友圈/小红书（模拟）`);
+            openModal('分享卡片已生成', `【${a.name}】\n准备分享到朋友圈/小红书（模拟）`);
           }else{
-            openModal("成就未解锁", `达成条件：${a.condition}`);
+            openModal('成就未解锁', `达成条件：${a.condition}`);
           }
         };
         box.appendChild(d);
@@ -1028,20 +1293,20 @@
         box.innerHTML = `<div class="tiny">当前分类暂无成就</div>`;
       }
     }
-    $("shareAllBtn").onclick=()=>openModal("展览柜分享", "已生成成就展览柜总览分享卡片（模拟）");
-    $("taskAchTabUn").onclick=()=>{ state.achUi.taskTab="undone"; state.achUi.taskPage=0; renderTaskAchievementLink(); };
-    $("taskAchTabDone").onclick=()=>{ state.achUi.taskTab="done"; state.achUi.taskPage=0; renderTaskAchievementLink(); };
-    $("taskAchPrev").onclick=()=>{ state.achUi.taskPage=Math.max(0, state.achUi.taskPage-1); renderTaskAchievementLink(); };
-    $("taskAchNext").onclick=()=>{
-      const list = state.achievements.filter(a=>state.achUi.taskTab==="undone" ? !a.unlocked : a.unlocked);
+    $('shareAllBtn').onclick=()=>openModal('展览柜分享', '已生成成就展览柜总览分享卡片（模拟）');
+    $('taskAchTabUn').onclick=()=>{ state.achUi.taskTab='undone'; state.achUi.taskPage=0; renderTaskAchievementLink(); };
+    $('taskAchTabDone').onclick=()=>{ state.achUi.taskTab='done'; state.achUi.taskPage=0; renderTaskAchievementLink(); };
+    $('taskAchPrev').onclick=()=>{ state.achUi.taskPage=Math.max(0, state.achUi.taskPage-1); renderTaskAchievementLink(); };
+    $('taskAchNext').onclick=()=>{
+      const list = state.achievements.filter(a=>state.achUi.taskTab==='undone' ? !a.unlocked : a.unlocked);
       const total = Math.max(1, Math.ceil(list.length/state.achUi.pageSize));
       state.achUi.taskPage=Math.min(total-1, state.achUi.taskPage+1);
       renderTaskAchievementLink();
     };
-    $("profileAchTabTask").onclick=()=>{ state.achUi.profileTab="task"; state.achUi.profilePage=0; renderProfileAchievements(); };
-    $("profileAchTabEvent").onclick=()=>{ state.achUi.profileTab="event"; state.achUi.profilePage=0; renderProfileAchievements(); };
-    $("profileAchPrev").onclick=()=>{ state.achUi.profilePage=Math.max(0, state.achUi.profilePage-1); renderProfileAchievements(); };
-    $("profileAchNext").onclick=()=>{
+    $('profileAchTabTask').onclick=()=>{ state.achUi.profileTab='task'; state.achUi.profilePage=0; renderProfileAchievements(); };
+    $('profileAchTabEvent').onclick=()=>{ state.achUi.profileTab='event'; state.achUi.profilePage=0; renderProfileAchievements(); };
+    $('profileAchPrev').onclick=()=>{ state.achUi.profilePage=Math.max(0, state.achUi.profilePage-1); renderProfileAchievements(); };
+    $('profileAchNext').onclick=()=>{
       const list = state.achievements.filter(a=>a.source===state.achUi.profileTab);
       const total = Math.max(1, Math.ceil(list.length/state.achUi.pageSize));
       state.achUi.profilePage=Math.min(total-1, state.achUi.profilePage+1);
@@ -1049,20 +1314,27 @@
     };
 
     function renderProfileForm(){
-      $("profileNickname").value = state.profile.nickname;
-      $("profileGender").value = state.profile.gender;
-      $("profileBirthday").value = state.profile.birthday;
-      $("profileMbti").value = state.profile.mbti;
+      $('profileNickname').value = state.profile.nickname;
+      $('profileGender').value = state.profile.gender;
+      $('profileBirthday').value = state.profile.birthday;
+      $('profileMbti').value = state.profile.mbti;
     }
-    $("saveProfileBtn").onclick=()=>{
-      state.profile.nickname = $("profileNickname").value.trim() || state.profile.nickname;
-      state.profile.gender = $("profileGender").value.trim() || state.profile.gender;
-      state.profile.birthday = $("profileBirthday").value.trim() || state.profile.birthday;
-      state.profile.mbti = $("profileMbti").value.trim() || state.profile.mbti;
+    $('saveProfileBtn').onclick=()=>{
+      state.profile.nickname = $('profileNickname').value.trim() || state.profile.nickname;
+      state.profile.gender = $('profileGender').value.trim() || state.profile.gender;
+      state.profile.birthday = $('profileBirthday').value.trim() || state.profile.birthday;
+      state.profile.mbti = $('profileMbti').value.trim() || state.profile.mbti;
       state.user.name = state.profile.nickname;
-      const tag = document.querySelector("#homeAvatar .name-tag");
+      const tag = document.querySelector('#homeAvatar .name-tag');
       if(tag) tag.textContent = state.profile.nickname;
-      showToast("资料已保存");
+      showToast('资料已保存');
+    };
+
+    $('copyUidBtn').onclick=()=>{
+      const uid = '100861398';
+      navigator.clipboard.writeText(uid).then(()=>{
+        showToast('UID已复制');
+      });
     };
 
     function visitFriend(friend){
@@ -1072,24 +1344,24 @@
       renderTaskAchievementLink();
       renderProfileAchievements();
       renderFriends();
-      showToast("帮助好友 +5经验");
-      openModal("好友主页", `昵称：${friend.nickname}
+      showToast('帮助好友 +5经验');
+      openModal('好友主页', `昵称：${friend.nickname}
 性别：${friend.gender}
 生日：${friend.birthday}
 MBTI：${friend.mbti}
 等级：Lv.${friend.level}
-成就：${friend.achievements.join("、")}
+成就：${friend.achievements.join('、')}
 衣柜：${friend.wardrobe}
 场景：${friend.scene}`);
     }
 
     function renderFriends(){
-      $("friendStats").textContent = `好友数：${state.friends.length} ｜ 累计拜访：${state.social.visits}`;
-      const box = $("friendList");
-      box.innerHTML = "";
+      $('friendStats').textContent = `好友数：${state.friends.length} ｜ 累计拜访：${state.social.visits}`;
+      const box = $('friendList');
+      box.innerHTML = '';
       state.friends.forEach(f=>{
-        const row = document.createElement("div");
-        row.className = "item-row";
+        const row = document.createElement('div');
+        row.className = 'item-row';
         row.innerHTML = `
           <div style="display:flex;justify-content:space-between;gap:8px;align-items:center;">
             <div>
@@ -1103,7 +1375,7 @@ MBTI：${friend.mbti}
         `;
         box.appendChild(row);
       });
-      box.querySelectorAll("[data-view]").forEach(btn=>{
+      box.querySelectorAll('[data-view]').forEach(btn=>{
         btn.onclick=()=>{
           const id = Number(btn.dataset.view);
           const friend = state.friends.find(f=>f.id===id);
@@ -1112,41 +1384,134 @@ MBTI：${friend.mbti}
       });
     }
 
-    function renderCalendar(){
+    // 全局变量存储当前选中的日期
+    let currentDate = new Date();
+    
+    // 初始化年月选择器
+    function initDateSelectors() {
+      const yearSelect = $('yearSelect');
+      const monthSelect = $('monthSelect');
       const now = new Date();
-      const y = now.getFullYear(), m = now.getMonth();
-      $("monthLabel").textContent = `${y}年${m+1}月`;
-      const first = new Date(y,m,1).getDay();
-      const days = new Date(y,m+1,0).getDate();
-      const prevDays = new Date(y,m,0).getDate();
-      const box = $("calendarGrid");
-      box.innerHTML = "";
+      const currentYear = now.getFullYear();
+      
+      // 添加年份选项（前后30年）
+      for (let year = currentYear - 30; year <= currentYear + 30; year++) {
+        const option = document.createElement('option');
+        option.value = year;
+        option.textContent = year;
+        if (year === currentYear) option.selected = true;
+        yearSelect.appendChild(option);
+      }
+      
+      // 添加月份选项
+      for (let month = 1; month <= 12; month++) {
+        const option = document.createElement('option');
+        option.value = month - 1; // 月份从0开始
+        option.textContent = month;
+        if (month - 1 === now.getMonth()) option.selected = true;
+        monthSelect.appendChild(option);
+      }
+      
+      // 事件监听器
+      yearSelect.onchange = () => {
+        currentDate.setFullYear(parseInt(yearSelect.value));
+        renderCalendar(currentDate.getFullYear(), currentDate.getMonth());
+      };
+      
+      monthSelect.onchange = () => {
+        currentDate.setMonth(parseInt(monthSelect.value));
+        renderCalendar(currentDate.getFullYear(), currentDate.getMonth());
+      };
+      
+      $('prevYearBtn').onclick = () => {
+        currentDate.setFullYear(currentDate.getFullYear() - 1);
+        updateDateSelectors();
+        renderCalendar(currentDate.getFullYear(), currentDate.getMonth());
+      };
+      
+      $('nextYearBtn').onclick = () => {
+        currentDate.setFullYear(currentDate.getFullYear() + 1);
+        updateDateSelectors();
+        renderCalendar(currentDate.getFullYear(), currentDate.getMonth());
+      };
+    }
+    
+    // 更新选择器值
+    function updateDateSelectors() {
+      $('yearSelect').value = currentDate.getFullYear();
+      $('monthSelect').value = currentDate.getMonth();
+    }
+    
+    // 存储事件数据
+    const calendarEvents = {};
+    
+    function renderCalendar(year, month) {
+      const y = year || currentDate.getFullYear();
+      const m = month !== undefined ? month : currentDate.getMonth();
+      
+      const first = new Date(y, m, 1).getDay();
+      const days = new Date(y, m + 1, 0).getDate();
+      const prevDays = new Date(y, m, 0).getDate();
+      const box = $('calendarGrid');
+      box.innerHTML = '';
 
       const tags = {
-        [`${y}-${m+1}-9`]:"🎂A",
-        [`${y}-${m+1}-18`]:"🎉"
+        [`${y}-${m+1}-9`]:'🎂A',
+        [`${y}-${m+1}-18`]:'🎉'
       };
+      
+      // 模拟任务完成数据
+      const taskCounts = {
+        [`${y}-${m+1}-1`]: 1,
+        [`${y}-${m+1}-2`]: 2,
+        [`${y}-${m+1}-3`]: 3,
+        [`${y}-${m+1}-4`]: 4,
+        [`${y}-${m+1}-5`]: 5,
+        [`${y}-${m+1}-6`]: 6,
+        [`${y}-${m+1}-7`]: 7,
+        [`${y}-${m+1}-8`]: 1,
+        [`${y}-${m+1}-9`]: 2,
+        [`${y}-${m+1}-10`]: 3,
+      };
+      
       for(let i=0;i<42;i++){
-        const d = document.createElement("div");
-        d.className = "day";
+        const d = document.createElement('div');
+        d.className = 'day';
         let day, other = false;
         if(i<first){ day = prevDays-first+i+1; other=true; }
         else if(i>=first+days){ day = i-first-days+1; other=true; }
         else day=i-first+1;
 
         const key = `${y}-${m+1}-${day}`;
-        const checked = state.calendarChecks.has(key);
-        const isToday = !other && day===now.getDate();
-        if(isToday) d.classList.add("today");
-        if(other) d.style.opacity=".35";
-        d.innerHTML = `<div>${day}</div><div class="mark">${checked?"💙":"▫️"}</div><div style="font-size:10px;color:#d87f7f;">${tags[key]||""}</div>`;
+        const isToday = !other && day===new Date().getDate() && m===new Date().getMonth() && y===new Date().getFullYear();
+        if(isToday) d.classList.add('today');
+        if(other) d.style.opacity='.35';
+        
+        // 确定打卡标记
+        let mark = '▫️';
+        const count = taskCounts[key] || 0;
+        if(count >= 7){
+          mark = '🌈';
+        } else if(count >= 5){
+          mark = '🌸';
+        } else if(count >= 1){
+          // 单色花瓣
+          mark = '🌼';
+        }
+        
+        d.innerHTML = `<div>${day}</div><div class="mark">${mark}</div><div style="font-size:10px;color:#d87f7f;">${tags[key]||''}</div>`;
+        
+        // 添加点击事件
         if(!other){
-          d.onclick=()=>{
-            if(state.calendarChecks.has(key)) state.calendarChecks.delete(key);
-            else state.calendarChecks.add(key);
-            renderCalendar();
+          d.onclick = () => {
+            const selectedDate = new Date(y, m, day);
+            currentDate = selectedDate;
+            updateDateSelectors();
+            renderCalendar(y, m);
+            showDateEvents(selectedDate);
           };
         }
+        
         box.appendChild(d);
       }
 
@@ -1154,21 +1519,50 @@ MBTI：${friend.mbti}
       const cursor = new Date();
       while(true){
         const k = `${cursor.getFullYear()}-${cursor.getMonth()+1}-${cursor.getDate()}`;
-        if(state.calendarChecks.has(k)){ streak++; cursor.setDate(cursor.getDate()-1); }
+        const count = taskCounts[k] || 0;
+        if(count >= 1){ streak++; cursor.setDate(cursor.getDate()-1); }
         else break;
       }
-      $("streakText").textContent = `连续打卡：${streak}天 · 节假日标注已显示`;
+      $('streakText').textContent = `连续打卡：${streak}天 · 节假日标注已显示`;
+    }
+    
+    // 显示选定日期的事件
+    function showDateEvents(date) {
+      const isToday = date.toDateString() === new Date().toDateString();
+      const title = isToday ? '今日事项' : '当日事项';
+      $('eventTitle').textContent = title;
+      
+      // 显示该日期的事件
+      renderEvents(date);
     }
 
-    $("eventAddBtn").onclick=()=>{
-      const t = $("eventInput").value.trim();
+    $('eventAddBtn').onclick=()=>{
+      const t = $('eventInput').value.trim();
       if(!t) return;
-      state.events.push(t);
-      $("eventInput").value="";
-      renderEvents();
+      
+      const icon = $('eventIconSelect').value;
+      const time = $('eventTimeInput').value;
+      
+      // 将事件保存到当前选中的日期
+      const dateKey = currentDate.toISOString().split('T')[0];
+      if(!calendarEvents[dateKey]){
+        calendarEvents[dateKey] = [];
+      }
+      calendarEvents[dateKey].push({ text: t, icon: icon, time: time });
+      
+      // 重置输入
+      $('eventInput').value='';
+      $('eventTimeInput').value='';
+      
+      renderEvents(currentDate);
     };
-    function renderEvents(){
-      $("eventList").innerHTML = state.events.map(e=>`<div class="task-item tiny">📝 ${e}</div>`).join("");
+    function renderEvents(date) {
+      const dateKey = date ? date.toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
+      const events = calendarEvents[dateKey] || [];
+      $('eventList').innerHTML = events.map(e=>{
+        const timeStr = e.time ? ` ${e.time}` : '';
+        return `<div class="task-item tiny">${e.icon} ${e.text}${timeStr}</div>`;
+      }).join('');
     }
 
     function renderBag(){
@@ -1178,56 +1572,56 @@ MBTI：${friend.mbti}
     }
 
     function renderWardrobe(){
-      const box = $("wardrobePanel");
-      box.innerHTML = "";
-      const categories = ["发型","上下装","袜子","鞋子","饰品-妆容","表情","限定套装"];
-      const catWrap = document.createElement("div");
-      catWrap.className = "wardrobe-cats";
-      catWrap.innerHTML = categories.map(c=>`<button class="wardrobe-cat ${state.bag.wardrobeCategory===c?"active":""}" data-wcat="${c}">${c}</button>`).join("");
+      const box = $('wardrobePanel');
+      box.innerHTML = '';
+      const categories = ['发型','上下装','袜子','鞋子','饰品-妆容','表情','限定套装'];
+      const catWrap = document.createElement('div');
+      catWrap.className = 'wardrobe-cats';
+      catWrap.innerHTML = categories.map(c=>`<button class="wardrobe-cat ${state.bag.wardrobeCategory===c?'active':''}" data-wcat="${c}">${c}</button>`).join('');
       box.appendChild(catWrap);
 
       const currentCategory = state.bag.wardrobeCategory;
       const list = state.bag.wardrobe.filter(item=>item.category===currentCategory);
       list.forEach(item=>{
         const canClaim = !item.owned && item.fragments>=item.need;
-        const div = document.createElement("div");
-        div.className = "item-row " + (item.owned ? "owned" : "");
+        const div = document.createElement('div');
+        div.className = 'item-row ' + (item.owned ? 'owned' : '');
         div.innerHTML = `
-          <div class="item-title">👗 ${item.name} ${item.equipped?"（已穿戴）":""}</div>
+          <div class="item-title">👗 ${item.name} ${item.equipped?'（已穿戴）':''}</div>
           <div class="tiny">${item.preview}</div>
-          <div class="tiny" style="margin-top:5px;">${item.owned ? "已拥有，可点击穿戴" : `碎片 ${item.fragments}/${item.need}`}</div>
-          ${item.owned ? "" : `<div class="wardrobe-hint">完成每日任务随机获得碎片</div>`}
+          <div class="tiny" style="margin-top:5px;">${item.owned ? '已拥有，可点击穿戴' : `碎片 ${item.fragments}/${item.need}`}</div>
+          ${item.owned ? '' : `<div class="wardrobe-hint">完成每日任务随机获得碎片</div>`}
           <div class="actions" style="margin-top:8px;">
             <button class="mini-btn" data-preview-w="${item.id}">预览</button>
             ${item.owned ? `<button class="mini-btn" data-equip-w="${item.id}">穿戴</button>` :
-            `<button class="mini-btn" data-go-task="1">去完成</button>${canClaim?`<button class="mini-btn" data-claim-w="${item.id}">领取</button>`:""}`}
+            `<button class="mini-btn" data-go-task="1">去完成</button>${canClaim?`<button class="mini-btn" data-claim-w="${item.id}">领取</button>`:''}`}
           </div>
         `;
         box.appendChild(div);
       });
 
-      box.querySelectorAll("[data-wcat]").forEach(btn=>{
+      box.querySelectorAll('[data-wcat]').forEach(btn=>{
         btn.onclick=()=>{
           state.bag.wardrobeCategory = btn.dataset.wcat;
           renderWardrobe();
         };
       });
-      box.querySelectorAll("[data-preview-w]").forEach(b=>{
-        b.onclick=()=>openModal("衣服预览", "已切换预览效果（模拟）");
+      box.querySelectorAll('[data-preview-w]').forEach(b=>{
+        b.onclick=()=>openModal('衣服预览', '已切换预览效果（模拟）');
       });
-      box.querySelectorAll("[data-go-task]").forEach(b=>{
-        b.onclick=()=>{ $("bagPanel").classList.remove("show"); switchPage("task"); };
+      box.querySelectorAll('[data-go-task]').forEach(b=>{
+        b.onclick=()=>{ $('bagPanel').classList.remove('show'); switchPage('task'); };
       });
-      box.querySelectorAll("[data-claim-w]").forEach(b=>{
+      box.querySelectorAll('[data-claim-w]').forEach(b=>{
         b.onclick=()=>{
           const id = b.dataset.claimW;
           const i = state.bag.wardrobe.find(x=>x.id===id);
           i.owned = true; i.equipped=false;
-          openModal("领取成功", `${i.name} 已加入衣柜`);
+          openModal('领取成功', `${i.name} 已加入衣柜`);
           renderWardrobe();
         };
       });
-      box.querySelectorAll("[data-equip-w]").forEach(b=>{
+      box.querySelectorAll('[data-equip-w]').forEach(b=>{
         b.onclick=()=>{
           const id = b.dataset.equipW;
           const i = state.bag.wardrobe.find(x=>x.id===id);
@@ -1235,46 +1629,46 @@ MBTI：${friend.mbti}
             .filter(x=>x.category===i.category)
             .forEach(x=>x.equipped=false);
           i.equipped = true;
-          if(i.category==="上下装") state.user.outfit = i.name;
-          openModal("穿戴成功", `当前穿戴：${i.name}`);
+          if(i.category==='上下装') state.user.outfit = i.name;
+          openModal('穿戴成功', `当前穿戴：${i.name}`);
           renderWardrobe();
         };
       });
     }
 
     function renderSceneBag(){
-      const box = $("scenePanel");
-      box.innerHTML = "";
+      const box = $('scenePanel');
+      box.innerHTML = '';
       state.bag.scenes.forEach(item=>{
         const canClaim = !item.owned && item.fragments>=item.need;
-        const div = document.createElement("div");
-        div.className = "item-row " + (item.owned ? "owned" : "");
+        const div = document.createElement('div');
+        div.className = 'item-row ' + (item.owned ? 'owned' : '');
         div.innerHTML = `
-          <div class="item-title">🌄 ${item.name} ${item.equipped?"（已使用）":""}</div>
+          <div class="item-title">🌄 ${item.name} ${item.equipped?'（已使用）':''}</div>
           <div class="tiny">${item.preview}</div>
-          <div class="tiny" style="margin-top:5px;">${item.owned ? "已拥有，可点击切换" : `碎片 ${item.fragments}/${item.need}`}</div>
+          <div class="tiny" style="margin-top:5px;">${item.owned ? '已拥有，可点击切换' : `碎片 ${item.fragments}/${item.need}`}</div>
           <div class="actions" style="margin-top:8px;">
             <button class="mini-btn" data-preview-s="${item.id}">预览</button>
             ${item.owned ? `<button class="mini-btn" data-equip-s="${item.id}">切换场景</button>` :
-            `<button class="mini-btn" data-go-task="1">去完成</button>${canClaim?`<button class="mini-btn" data-claim-s="${item.id}">领取</button>`:""}`}
+            `<button class="mini-btn" data-go-task="1">去完成</button>${canClaim?`<button class="mini-btn" data-claim-s="${item.id}">领取</button>`:''}`}
           </div>
         `;
         box.appendChild(div);
       });
 
-      box.querySelectorAll("[data-preview-s]").forEach(b=>{
-        b.onclick=()=>openModal("场景预览", "已展示场景预览（模拟）");
+      box.querySelectorAll('[data-preview-s]').forEach(b=>{
+        b.onclick=()=>openModal('场景预览', '已展示场景预览（模拟）');
       });
-      box.querySelectorAll("[data-claim-s]").forEach(b=>{
+      box.querySelectorAll('[data-claim-s]').forEach(b=>{
         b.onclick=()=>{
           const id = b.dataset.claimS;
           const i = state.bag.scenes.find(x=>x.id===id);
           i.owned = true;
-          openModal("领取成功", `${i.name} 已加入场景库`);
+          openModal('领取成功', `${i.name} 已加入场景库`);
           renderSceneBag();
         };
       });
-      box.querySelectorAll("[data-equip-s]").forEach(b=>{
+      box.querySelectorAll('[data-equip-s]').forEach(b=>{
         b.onclick=()=>{
           const id = b.dataset.equipS;
           state.bag.scenes.forEach(i=>i.equipped=false);
@@ -1282,104 +1676,105 @@ MBTI：${friend.mbti}
           i.equipped=true;
           state.user.scene = i.name;
           applySceneVisual();
-          openModal("场景切换成功", `当前场景：${i.name}`);
+          openModal('场景切换成功', `当前场景：${i.name}`);
           renderSceneBag();
         };
       });
-      box.querySelectorAll("[data-go-task]").forEach(b=>{
-        b.onclick=()=>{ $("bagPanel").classList.remove("show"); switchPage("task"); };
+      box.querySelectorAll('[data-go-task]').forEach(b=>{
+        b.onclick=()=>{ $('bagPanel').classList.remove('show'); switchPage('task'); };
       });
     }
 
     function applySceneVisual(){
       const s = state.user.scene;
-      const scene = $("sceneView");
-      if(s==="花海"){
-        scene.style.background = "linear-gradient(180deg,#bfe4ff 0%,#d8edff 38%,#9ad08f 39%,#7ac36f 100%)";
-      }else if(s==="草地露营"){
-        scene.style.background = "linear-gradient(180deg,#c8e6ff 0%,#dff1ff 40%,#8fcb80 41%,#6bb55d 100%)";
+      const scene = $('sceneView');
+      if(s==='花海'){
+        scene.style.background = 'linear-gradient(180deg,#bfe4ff 0%,#d8edff 38%,#9ad08f 39%,#7ac36f 100%)';
+      }else if(s==='草地露营'){
+        scene.style.background = 'linear-gradient(180deg,#c8e6ff 0%,#dff1ff 40%,#8fcb80 41%,#6bb55d 100%)';
       }else{
-        scene.style.background = "linear-gradient(180deg,#ffe6b8 0%,#ffdba4 35%,#8dcf91 36%,#70be68 100%)";
+        scene.style.background = 'linear-gradient(180deg,#ffe6b8 0%,#ffdba4 35%,#8dcf91 36%,#70be68 100%)';
       }
     }
 
     function openBagTab(tabName){
-      $("bagPanel").classList.add("show");
-      if(tabName === "scene"){
-        state.bag.tab="scene";
-        $("scenePanel").classList.remove("hidden");
-        $("wardrobePanel").classList.add("hidden");
-        $("sceneTabBtn").classList.add("active");
-        $("wardrobeTabBtn").classList.remove("active");
+      $('bagPanel').classList.add('show');
+      if(tabName === 'scene'){
+        state.bag.tab='scene';
+        $('scenePanel').classList.remove('hidden');
+        $('wardrobePanel').classList.add('hidden');
+        $('sceneTabBtn').classList.add('active');
+        $('wardrobeTabBtn').classList.remove('active');
       }else{
-        state.bag.tab="wardrobe";
-        $("wardrobePanel").classList.remove("hidden");
-        $("scenePanel").classList.add("hidden");
-        $("wardrobeTabBtn").classList.add("active");
-        $("sceneTabBtn").classList.remove("active");
+        state.bag.tab='wardrobe';
+        $('wardrobePanel').classList.remove('hidden');
+        $('scenePanel').classList.add('hidden');
+        $('wardrobeTabBtn').classList.add('active');
+        $('sceneTabBtn').classList.remove('active');
       }
     }
-    document.querySelectorAll("[data-home-action]").forEach(btn=>{
+    document.querySelectorAll('[data-home-action]').forEach(btn=>{
       btn.onclick=()=>{
         const a = btn.dataset.homeAction;
-        if(a==="bag") openBagTab("wardrobe");
-        if(a==="friend"){ $("friendPanel").classList.add("show"); renderFriends(); }
-        if(a==="wardrobe") openBagTab("wardrobe");
-        if(a==="scene") openBagTab("scene");
+        if(a==='bag') openBagTab('wardrobe');
+        if(a==='friend'){ $('friendPanel').classList.add('show'); renderFriends(); }
+        if(a==='wardrobe') openBagTab('wardrobe');
+        if(a==='scene') openBagTab('scene');
+        if(a==='vocab') window.location.href = 'vocab.html';
       };
     });
-    $("bagCloseBtn").onclick=()=>{ $("bagPanel").classList.remove("show"); };
-    $("friendCloseBtn").onclick=()=>{ $("friendPanel").classList.remove("show"); };
-    $("addFriendBtn").onclick=()=>{
-      const name = $("friendNameInput").value.trim();
+    $('bagCloseBtn').onclick=()=>{ $('bagPanel').classList.remove('show'); };
+    $('friendCloseBtn').onclick=()=>{ $('friendPanel').classList.remove('show'); };
+    $('addFriendBtn').onclick=()=>{
+      const name = $('friendNameInput').value.trim();
       if(!name) return;
       state.friends.push({
         id:Date.now(),
         nickname:name,
-        gender:"未知",
-        birthday:"未设置",
-        mbti:"未设置",
+        gender:'未知',
+        birthday:'未设置',
+        mbti:'未设置',
         level:Math.floor(Math.random()*5)+2,
-        achievements:["新朋友"],
-        wardrobe:"蓝色裙子",
-        scene:"花海"
+        achievements:['新朋友'],
+        wardrobe:'蓝色裙子',
+        scene:'花海'
       });
-      $("friendNameInput").value = "";
+      $('friendNameInput').value = '';
       updateSocialAchievements();
       renderTaskAchievementLink();
       renderProfileAchievements();
       renderFriends();
-      showToast("添加好友成功");
+      showToast('添加好友成功');
     };
-    $("wardrobeTabBtn").onclick=()=>{
-      state.bag.tab="wardrobe";
-      $("wardrobePanel").classList.remove("hidden");
-      $("scenePanel").classList.add("hidden");
-      $("wardrobeTabBtn").classList.add("active");
-      $("sceneTabBtn").classList.remove("active");
+    $('wardrobeTabBtn').onclick=()=>{
+      state.bag.tab='wardrobe';
+      $('wardrobePanel').classList.remove('hidden');
+      $('scenePanel').classList.add('hidden');
+      $('wardrobeTabBtn').classList.add('active');
+      $('sceneTabBtn').classList.remove('active');
     };
-    $("sceneTabBtn").onclick=()=>{
-      state.bag.tab="scene";
-      $("scenePanel").classList.remove("hidden");
-      $("wardrobePanel").classList.add("hidden");
-      $("sceneTabBtn").classList.add("active");
-      $("wardrobeTabBtn").classList.remove("active");
+    $('sceneTabBtn').onclick=()=>{
+      state.bag.tab='scene';
+      $('scenePanel').classList.remove('hidden');
+      $('wardrobePanel').classList.add('hidden');
+      $('sceneTabBtn').classList.add('active');
+      $('wardrobeTabBtn').classList.remove('active');
     };
 
     function formatMMSS(s){
-      const m = Math.floor(s/60).toString().padStart(2,"0");
-      const sec = (s%60).toString().padStart(2,"0");
+      const m = Math.floor(s/60).toString().padStart(2,'0');
+      const sec = (s%60).toString().padStart(2,'0');
       return `${m}:${sec}`;
     }
 
     function enterFocus(){
       state.focus.active = true;
       state.focus.remainSec = state.focus.totalSec;
-      $("focusLayer").classList.add("show");
-      $("topbar").classList.add("hidden");
-      $("tabs").classList.add("hidden");
-      $("bagPanel").classList.remove("show");
-      $("friendPanel").classList.remove("show");
+      $('focusLayer').classList.add('show');
+      $('topbar').classList.add('hidden');
+      $('tabs').classList.add('hidden');
+      $('bagPanel').classList.remove('show');
+      $('friendPanel').classList.remove('show');
       updateFocusUI();
       if(state.focus.timer) clearInterval(state.focus.timer);
       state.focus.timer = setInterval(()=>{
@@ -1389,30 +1784,30 @@ MBTI：${friend.mbti}
           clearInterval(state.focus.timer);
           state.focus.timer=null;
           gainXp(20);
-          openModal("专注完成", "30分钟专注完成，经验 +20");
+          openModal('专注完成', '30分钟专注完成，经验 +20');
           exitFocus();
         }
       },1000);
     }
 
     function updateFocusUI(){
-      $("focusTime").textContent = formatMMSS(Math.max(0,state.focus.remainSec));
+      $('focusTime').textContent = formatMMSS(Math.max(0,state.focus.remainSec));
       const total = 578;
       const pct = state.focus.remainSec/state.focus.totalSec;
-      $("focusRing").style.strokeDashoffset = total*(1-pct);
+      $('focusRing').style.strokeDashoffset = total*(1-pct);
     }
 
     function exitFocus(){
       state.focus.active=false;
-      $("focusLayer").classList.remove("show");
-      $("topbar").classList.remove("hidden");
-      $("tabs").classList.remove("hidden");
+      $('focusLayer').classList.remove('show');
+      $('topbar').classList.remove('hidden');
+      $('tabs').classList.remove('hidden');
       if(state.focus.timer){ clearInterval(state.focus.timer); state.focus.timer=null; }
-      switchPage("home");
+      switchPage('home');
     }
 
-    $("focusBtn").onclick=enterFocus;
-    $("focusEndBtn").onclick=exitFocus;
+    $('focusBtn').onclick=enterFocus;
+    $('focusEndBtn').onclick=exitFocus;
 
     const defaultModalOk = closeModal;
     function showDailyGift(){
@@ -1422,12 +1817,12 @@ MBTI：${friend.mbti}
       const frag = Math.floor(Math.random()*2)+1;
       gainXp(xp);
       state.user.shards += frag;
-      openModal("每日登录礼盒", `欢迎回来，viya！\n获得经验 +${xp}\n皮肤碎片 +${frag}`);
+      openModal('每日登录礼盒', `欢迎回来，viya！\n获得经验 +${xp}\n皮肤碎片 +${frag}`);
     }
 
     function init(){
-      drawPixelGirl("homeGirlCanvas", "stand");
-      drawPixelGirl("focusGirlCanvas", "meditate");
+      drawPixelGirl('homeGirlCanvas', 'stand');
+      drawPixelGirl('focusGirlCanvas', 'meditate');
       updateSocialAchievements();
       renderUser();
       renderProfileForm();
@@ -1435,8 +1830,9 @@ MBTI：${friend.mbti}
       renderCustomTasks();
       renderTaskAchievementLink();
       renderProfileAchievements();
+      initDateSelectors();
       renderCalendar();
-      renderEvents();
+      showDateEvents(currentDate);
       renderBag();
       renderFriends();
       setTimeout(showDailyGift,300);
