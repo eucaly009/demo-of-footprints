@@ -32,15 +32,25 @@
     }
     .hidden{display:none !important;}
     .topbar{
-      height:56px;
+      padding:8px 12px 10px;
+      background:linear-gradient(180deg,#d5e8fb,#c7e0f9);
+      border-bottom:2px dashed rgba(46,59,72,.18);
+    }
+    .top-row{
       display:flex;
       align-items:center;
       justify-content:space-between;
-      padding:0 12px;
-      background:linear-gradient(180deg,#c8e2fb,#b7d8f7);
-      border-bottom:2px dashed rgba(46,59,72,.18);
+      margin-bottom:6px;
     }
-    .brand{font-weight:800;letter-spacing:.5px;font-size:15px;}
+    .brand{font-weight:800;letter-spacing:.5px;font-size:14px;}
+    .xp-top{
+      width:100%;
+      height:8px;
+      border-radius:999px;
+      background:#e6f1fd;
+      overflow:hidden;
+      border:1px solid rgba(46,59,72,.2);
+    }
     .icon-btn{
       border:0;background:#fff;color:#2d5578;border-radius:12px;padding:7px 10px;
       font-weight:700;box-shadow:var(--shadow);cursor:pointer;transition:.12s transform,.12s filter;
@@ -59,7 +69,7 @@
     .bar{height:11px;background:#dcebf9;border-radius:999px;overflow:hidden;border:1px solid rgba(46,59,72,.2);}
     .fill{height:100%;background:linear-gradient(90deg,#7cc895,#72b7ff);width:0%;transition:width .4s ease;}
     .scene{
-      height:430px;border-radius:20px;position:relative;overflow:hidden;
+      height:310px;border-radius:20px;position:relative;overflow:hidden;
       background:linear-gradient(180deg,#bfe4ff 0%,#d8edff 38%,#9ad08f 39%,#7ac36f 100%);
       border:2px solid rgba(136,184,232,.4);
       box-shadow:var(--shadow);
@@ -80,174 +90,26 @@
       radial-gradient(circle at 84% 50%,#c8b8ff 0 7px,transparent 8px),
       linear-gradient(180deg,#87cb79,#6bbf61);
     }
-    /* 动森感：使用“点阵像素精灵图（box-shadow）”绘制角色 */
     .avatar-wrap{
       position:absolute;
       left:50%;
-      top:56%;
+      top:55%;
       transform:translate(-50%,-50%);
       display:flex;
       flex-direction:column;
       align-items:center;
-      gap:10px;
+      gap:8px;
       z-index:3;
       pointer-events:none;
     }
-
-    .ac-sprite{
-      --px: 7px; /* 像素块尺寸（越大越像“点阵”） */
-      --ol:#283241;     /* 描边/发色深 */
-      --hair:#6a4a3f;
-      --hair2:#7a5649;
-      --skin:#ffe7d6;
-      --cheek:#ffb7c8;
-      --dress:#88B8E8;
-      --dress2:#6aa7dd;
-      --sock:#ffffff;
-      --shoe:#5a4038;
-      width:calc(18 * var(--px));
-      height:calc(24 * var(--px));
-      position:relative;
+    .pixel-canvas{
+      width:min(72vw, 270px);
+      max-width:270px;
+      height:auto;
       image-rendering:pixelated;
       image-rendering:crisp-edges;
-      filter:drop-shadow(0 10px 0 rgba(0,0,0,.10));
-      transform:scale(1.05);
+      filter:drop-shadow(0 10px 0 rgba(0,0,0,.11));
     }
-
-    .ac-sprite::after{
-      content:"";
-      position:absolute;
-      left:50%;
-      bottom:calc(-1.2 * var(--px));
-      transform:translateX(-50%);
-      width:calc(14 * var(--px));
-      height:calc(3.2 * var(--px));
-      background:rgba(0,0,0,.12);
-      border-radius:999px;
-      filter:blur(.2px);
-    }
-
-    .ac-sprite::before{
-      content:"";
-      position:absolute;
-      left:0; top:0;
-      width:var(--px);
-      height:var(--px);
-      box-shadow:
-        /* 站立像素小女孩（18x24） */
-        /* 头发外轮廓 */
-        calc(6*var(--px)) calc(0*var(--px)) var(--ol),
-        calc(7*var(--px)) calc(0*var(--px)) var(--ol),
-        calc(8*var(--px)) calc(0*var(--px)) var(--ol),
-        calc(5*var(--px)) calc(1*var(--px)) var(--ol),
-        calc(6*var(--px)) calc(1*var(--px)) var(--hair),
-        calc(7*var(--px)) calc(1*var(--px)) var(--hair),
-        calc(8*var(--px)) calc(1*var(--px)) var(--hair),
-        calc(9*var(--px)) calc(1*var(--px)) var(--ol),
-        calc(4*var(--px)) calc(2*var(--px)) var(--ol),
-        calc(5*var(--px)) calc(2*var(--px)) var(--hair),
-        calc(6*var(--px)) calc(2*var(--px)) var(--hair),
-        calc(7*var(--px)) calc(2*var(--px)) var(--hair2),
-        calc(8*var(--px)) calc(2*var(--px)) var(--hair),
-        calc(9*var(--px)) calc(2*var(--px)) var(--hair),
-        calc(10*var(--px)) calc(2*var(--px)) var(--ol),
-        /* 发梢两侧 */
-        calc(3*var(--px)) calc(3*var(--px)) var(--ol),
-        calc(4*var(--px)) calc(3*var(--px)) var(--hair),
-        calc(10*var(--px)) calc(3*var(--px)) var(--hair),
-        calc(11*var(--px)) calc(3*var(--px)) var(--ol),
-        calc(3*var(--px)) calc(4*var(--px)) var(--ol),
-        calc(4*var(--px)) calc(4*var(--px)) var(--hair),
-        calc(5*var(--px)) calc(4*var(--px)) var(--hair),
-        calc(9*var(--px)) calc(4*var(--px)) var(--hair),
-        calc(10*var(--px)) calc(4*var(--px)) var(--hair),
-        calc(11*var(--px)) calc(4*var(--px)) var(--ol),
-        /* 脸轮廓 */
-        calc(4*var(--px)) calc(5*var(--px)) var(--ol),
-        calc(5*var(--px)) calc(5*var(--px)) var(--skin),
-        calc(6*var(--px)) calc(5*var(--px)) var(--skin),
-        calc(7*var(--px)) calc(5*var(--px)) var(--skin),
-        calc(8*var(--px)) calc(5*var(--px)) var(--skin),
-        calc(9*var(--px)) calc(5*var(--px)) var(--skin),
-        calc(10*var(--px)) calc(5*var(--px)) var(--ol),
-        calc(4*var(--px)) calc(6*var(--px)) var(--ol),
-        calc(5*var(--px)) calc(6*var(--px)) var(--skin),
-        calc(6*var(--px)) calc(6*var(--px)) var(--skin),
-        calc(7*var(--px)) calc(6*var(--px)) var(--skin),
-        calc(8*var(--px)) calc(6*var(--px)) var(--skin),
-        calc(9*var(--px)) calc(6*var(--px)) var(--skin),
-        calc(10*var(--px)) calc(6*var(--px)) var(--ol),
-        calc(4*var(--px)) calc(7*var(--px)) var(--ol),
-        calc(5*var(--px)) calc(7*var(--px)) var(--skin),
-        calc(6*var(--px)) calc(7*var(--px)) #ffffff,
-        calc(7*var(--px)) calc(7*var(--px)) var(--skin),
-        calc(8*var(--px)) calc(7*var(--px)) var(--skin),
-        calc(9*var(--px)) calc(7*var(--px)) #ffffff,
-        calc(10*var(--px)) calc(7*var(--px)) var(--skin),
-        calc(11*var(--px)) calc(7*var(--px)) var(--ol),
-        /* 眼珠 */
-        calc(6*var(--px)) calc(8*var(--px)) var(--ol),
-        calc(9*var(--px)) calc(8*var(--px)) var(--ol),
-        /* 腮红 */
-        calc(5*var(--px)) calc(9*var(--px)) var(--cheek),
-        calc(10*var(--px)) calc(9*var(--px)) var(--cheek),
-        /* 嘴 */
-        calc(7*var(--px)) calc(10*var(--px)) #c87878,
-        calc(8*var(--px)) calc(10*var(--px)) #c87878,
-        /* 下巴 */
-        calc(5*var(--px)) calc(11*var(--px)) var(--ol),
-        calc(6*var(--px)) calc(11*var(--px)) var(--skin),
-        calc(7*var(--px)) calc(11*var(--px)) var(--skin),
-        calc(8*var(--px)) calc(11*var(--px)) var(--skin),
-        calc(9*var(--px)) calc(11*var(--px)) var(--skin),
-        calc(10*var(--px)) calc(11*var(--px)) var(--ol),
-        /* 身体（裙子） */
-        calc(5*var(--px)) calc(12*var(--px)) var(--ol),
-        calc(6*var(--px)) calc(12*var(--px)) var(--dress),
-        calc(7*var(--px)) calc(12*var(--px)) var(--dress),
-        calc(8*var(--px)) calc(12*var(--px)) var(--dress),
-        calc(9*var(--px)) calc(12*var(--px)) var(--dress),
-        calc(10*var(--px)) calc(12*var(--px)) var(--ol),
-        /* 手臂 */
-        calc(4*var(--px)) calc(13*var(--px)) var(--skin),
-        calc(11*var(--px)) calc(13*var(--px)) var(--skin),
-        /* 裙身加深 */
-        calc(6*var(--px)) calc(13*var(--px)) var(--dress),
-        calc(7*var(--px)) calc(13*var(--px)) var(--dress),
-        calc(8*var(--px)) calc(13*var(--px)) var(--dress),
-        calc(9*var(--px)) calc(13*var(--px)) var(--dress),
-        calc(5*var(--px)) calc(14*var(--px)) var(--ol),
-        calc(6*var(--px)) calc(14*var(--px)) var(--dress2),
-        calc(7*var(--px)) calc(14*var(--px)) var(--dress2),
-        calc(8*var(--px)) calc(14*var(--px)) var(--dress2),
-        calc(9*var(--px)) calc(14*var(--px)) var(--dress2),
-        calc(10*var(--px)) calc(14*var(--px)) var(--ol),
-        /* 裙摆 */
-        calc(4*var(--px)) calc(15*var(--px)) var(--ol),
-        calc(5*var(--px)) calc(15*var(--px)) var(--dress),
-        calc(6*var(--px)) calc(15*var(--px)) var(--dress),
-        calc(7*var(--px)) calc(15*var(--px)) var(--dress),
-        calc(8*var(--px)) calc(15*var(--px)) var(--dress),
-        calc(9*var(--px)) calc(15*var(--px)) var(--dress),
-        calc(10*var(--px)) calc(15*var(--px)) var(--dress),
-        calc(11*var(--px)) calc(15*var(--px)) var(--ol),
-        /* 腿 */
-        calc(6*var(--px)) calc(16*var(--px)) var(--skin),
-        calc(9*var(--px)) calc(16*var(--px)) var(--skin),
-        calc(6*var(--px)) calc(17*var(--px)) var(--skin),
-        calc(9*var(--px)) calc(17*var(--px)) var(--skin),
-        /* 袜子 */
-        calc(6*var(--px)) calc(18*var(--px)) var(--sock),
-        calc(9*var(--px)) calc(18*var(--px)) var(--sock),
-        /* 鞋 */
-        calc(5*var(--px)) calc(19*var(--px)) var(--shoe),
-        calc(6*var(--px)) calc(19*var(--px)) var(--shoe),
-        calc(8*var(--px)) calc(19*var(--px)) var(--shoe),
-        calc(9*var(--px)) calc(19*var(--px)) var(--shoe),
-        calc(10*var(--px)) calc(19*var(--px)) var(--shoe);
-      background:transparent;
-    }
-
     .name-tag{
       background:rgba(255,255,255,.94);
       border:2px solid #2a3540;
@@ -259,81 +121,57 @@
       box-shadow:var(--shadow);
       pointer-events:none;
     }
-
-    /* 专注：盘腿冥想精灵图（更大、更像点阵） */
-    .ac-sprite.ac-meditate{
-      --px: 7px;
-      width:calc(20 * var(--px));
-      height:calc(20 * var(--px));
-      filter:drop-shadow(0 10px 0 rgba(0,0,0,.10));
-      transform:scale(1.08);
+    .focus-avatar-wrap{
+      position:absolute;
+      left:50%;
+      top:50%;
+      transform:translate(-50%,-50%);
+      pointer-events:none;
+      display:flex;
+      align-items:center;
+      justify-content:center;
     }
-    .ac-sprite.ac-meditate::after{display:none;}
-    .ac-sprite.ac-meditate::before{
-      box-shadow:
-        /* 冥想（20x20）：头更大、闭眼、盘腿 */
-        calc(8*var(--px)) calc(1*var(--px)) var(--ol),
-        calc(9*var(--px)) calc(1*var(--px)) var(--ol),
-        calc(10*var(--px)) calc(1*var(--px)) var(--ol),
-        calc(7*var(--px)) calc(2*var(--px)) var(--ol),
-        calc(8*var(--px)) calc(2*var(--px)) var(--hair),
-        calc(9*var(--px)) calc(2*var(--px)) var(--hair),
-        calc(10*var(--px)) calc(2*var(--px)) var(--hair),
-        calc(11*var(--px)) calc(2*var(--px)) var(--ol),
-        calc(6*var(--px)) calc(3*var(--px)) var(--ol),
-        calc(7*var(--px)) calc(3*var(--px)) var(--hair),
-        calc(8*var(--px)) calc(3*var(--px)) var(--hair2),
-        calc(9*var(--px)) calc(3*var(--px)) var(--hair2),
-        calc(10*var(--px)) calc(3*var(--px)) var(--hair),
-        calc(11*var(--px)) calc(3*var(--px)) var(--hair),
-        calc(12*var(--px)) calc(3*var(--px)) var(--ol),
-        /* 脸 */
-        calc(7*var(--px)) calc(4*var(--px)) var(--ol),
-        calc(8*var(--px)) calc(4*var(--px)) var(--skin),
-        calc(9*var(--px)) calc(4*var(--px)) var(--skin),
-        calc(10*var(--px)) calc(4*var(--px)) var(--skin),
-        calc(11*var(--px)) calc(4*var(--px)) var(--ol),
-        calc(7*var(--px)) calc(5*var(--px)) var(--ol),
-        calc(8*var(--px)) calc(5*var(--px)) var(--skin),
-        calc(9*var(--px)) calc(5*var(--px)) var(--skin),
-        calc(10*var(--px)) calc(5*var(--px)) var(--skin),
-        calc(11*var(--px)) calc(5*var(--px)) var(--ol),
-        /* 闭眼 */
-        calc(8*var(--px)) calc(6*var(--px)) var(--ol),
-        calc(10*var(--px)) calc(6*var(--px)) var(--ol),
-        /* 腮红 */
-        calc(7*var(--px)) calc(7*var(--px)) var(--cheek),
-        calc(11*var(--px)) calc(7*var(--px)) var(--cheek),
-        /* 嘴 */
-        calc(9*var(--px)) calc(8*var(--px)) #c87878,
-        /* 身体 */
-        calc(7*var(--px)) calc(9*var(--px)) var(--ol),
-        calc(8*var(--px)) calc(9*var(--px)) var(--dress),
-        calc(9*var(--px)) calc(9*var(--px)) var(--dress),
-        calc(10*var(--px)) calc(9*var(--px)) var(--dress),
-        calc(11*var(--px)) calc(9*var(--px)) var(--ol),
-        calc(6*var(--px)) calc(10*var(--px)) var(--skin),
-        calc(12*var(--px)) calc(10*var(--px)) var(--skin),
-        calc(7*var(--px)) calc(10*var(--px)) var(--dress2),
-        calc(8*var(--px)) calc(10*var(--px)) var(--dress2),
-        calc(9*var(--px)) calc(10*var(--px)) var(--dress2),
-        calc(10*var(--px)) calc(10*var(--px)) var(--dress2),
-        calc(11*var(--px)) calc(10*var(--px)) var(--dress2),
-        /* 盘腿 */
-        calc(6*var(--px)) calc(12*var(--px)) var(--dress2),
-        calc(7*var(--px)) calc(12*var(--px)) var(--dress2),
-        calc(8*var(--px)) calc(12*var(--px)) var(--dress2),
-        calc(9*var(--px)) calc(12*var(--px)) var(--dress2),
-        calc(10*var(--px)) calc(12*var(--px)) var(--dress2),
-        calc(11*var(--px)) calc(12*var(--px)) var(--dress2),
-        calc(12*var(--px)) calc(12*var(--px)) var(--dress2),
-        calc(5*var(--px)) calc(13*var(--px)) var(--shoe),
-        calc(6*var(--px)) calc(13*var(--px)) var(--shoe),
-        calc(7*var(--px)) calc(13*var(--px)) var(--dress2),
-        calc(12*var(--px)) calc(13*var(--px)) var(--dress2),
-        calc(13*var(--px)) calc(13*var(--px)) var(--shoe),
-        calc(14*var(--px)) calc(13*var(--px)) var(--shoe);
-      background:transparent;
+    .focus-pixel-canvas{
+      width:min(74vw, 280px);
+      max-width:280px;
+      height:auto;
+      image-rendering:pixelated;
+      image-rendering:crisp-edges;
+      filter:drop-shadow(0 10px 0 rgba(0,0,0,.11));
+    }
+    .home-side-actions{
+      position:absolute;
+      right:8px;
+      top:52px;
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      z-index:6;
+    }
+    .home-action{
+      width:54px;
+      border:2px solid rgba(47,95,142,.25);
+      background:rgba(255,255,255,.92);
+      border-radius:12px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      padding:6px 3px 5px;
+      font-size:10px;
+      color:#355b80;
+      font-weight:700;
+      box-shadow:var(--shadow);
+      cursor:pointer;
+      transition:.12s transform,.12s filter;
+    }
+    .home-action:active{transform:scale(.95);filter:brightness(.97);}
+    .home-action .i{font-size:16px;line-height:1;margin-bottom:2px;}
+    .home-bottom{
+      margin-top:10px;
+      display:grid;
+      grid-template-columns:1fr;
+      gap:10px;
     }
     .scene-top{position:absolute;left:10px;top:10px;display:flex;gap:8px;align-items:center;}
     .chip{
@@ -347,11 +185,13 @@
       width:100%;border:0;border-radius:12px;background:linear-gradient(180deg,#9dc8f0,#88B8E8);color:#fff;
       font-weight:800;padding:11px;box-shadow:0 8px 16px rgba(136,184,232,.36);cursor:pointer;transition:.12s transform,.12s filter;
     }
-    .level-box{
-      position:absolute;left:10px;right:10px;bottom:66px;background:rgba(255,255,255,.9);
-      border-radius:12px;padding:8px;border:2px solid rgba(136,184,232,.5);
+    .scene-overlay-info{
+      position:absolute;
+      left:10px;
+      top:12px;
+      z-index:5;
     }
-    .level-line{display:flex;justify-content:space-between;font-size:12px;color:#54708b;margin-bottom:5px;}
+    .scene-overlay-info .chip{margin-bottom:4px;}
     .tabs{
       position:absolute;left:0;right:0;bottom:0;height:74px;background:#fff;
       border-top:2px solid rgba(136,184,232,.45);display:grid;grid-template-columns:repeat(4,1fr);padding:6px;
@@ -399,6 +239,33 @@
     }
     .ach-item.locked{filter:grayscale(1);opacity:.8;}
     .ach-icon{width:50px;height:50px;border-radius:50%;display:grid;place-items:center;margin:0 auto 6px;font-size:23px;background:#eaf4ff;border:2px solid #7aa8d8;}
+    .ach-toolbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
+      margin-bottom:8px;
+    }
+    .ach-tabs{display:flex;gap:6px;flex-wrap:wrap;}
+    .ach-tab-btn{
+      border:0;
+      border-radius:10px;
+      background:#eaf4ff;
+      color:#3a6287;
+      padding:6px 10px;
+      font-size:11px;
+      font-weight:700;
+      cursor:pointer;
+    }
+    .ach-tab-btn.active{background:#88B8E8;color:#fff;}
+    .ach-pager{display:flex;align-items:center;gap:6px;}
+    .pager-btn{
+      border:0;
+      width:26px;height:26px;border-radius:8px;
+      background:#eaf4ff;color:#2f5f8e;font-weight:900;cursor:pointer;
+    }
+    .pager-btn:disabled{opacity:.4;cursor:not-allowed;}
+    .pager-info{font-size:11px;color:#6f7d8a;min-width:38px;text-align:center;}
     .calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;}
     .week{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;font-size:11px;color:var(--muted);text-align:center;margin-bottom:6px;}
     .day{
@@ -411,6 +278,10 @@
       position:absolute;inset:0;background:#eff7ff;z-index:20;padding:12px 12px 84px;display:none;
     }
     .bag-panel.show{display:block;}
+    .friend-panel{
+      position:absolute;inset:0;background:#eff7ff;z-index:22;padding:12px 12px 84px;display:none;overflow:auto;
+    }
+    .friend-panel.show{display:block;}
     .bag-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
     .seg{display:flex;background:#deecfb;padding:4px;border-radius:12px;gap:4px;}
     .seg button{border:0;background:transparent;border-radius:9px;padding:8px 12px;font-weight:700;color:#4d6782;cursor:pointer;}
@@ -419,6 +290,31 @@
     .item-row.owned{border-style:solid;background:#eef9f1;border-color:rgba(124,200,149,.52);}
     .item-title{font-weight:800;font-size:13px;margin-bottom:4px;}
     .actions{display:flex;gap:6px;flex-wrap:wrap;}
+    .wardrobe-cats{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:6px;
+      margin-bottom:10px;
+    }
+    .wardrobe-cat{
+      border:0;
+      background:#e9f3ff;
+      color:#3b6184;
+      border-radius:10px;
+      padding:7px 4px;
+      font-size:11px;
+      font-weight:700;
+      cursor:pointer;
+    }
+    .wardrobe-cat.active{
+      background:#88B8E8;
+      color:#fff;
+    }
+    .wardrobe-hint{
+      margin-top:6px;
+      font-size:11px;
+      color:#7a8aa0;
+    }
     .focus-layer{
       position:absolute;inset:0;z-index:40;display:none;
       background:linear-gradient(180deg,#bee3ff,#d7edff 38%,#8bce80 39%,#6abf62);
@@ -446,13 +342,41 @@
     .modal h4{margin:2px 0 8px;font-size:16px;}
     .modal p{margin:0;color:#5f6f7f;font-size:13px;white-space:pre-line;}
     .modal .btn{margin-top:10px;}
+    .profile-form{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:8px;
+    }
+    .profile-form .input.full{grid-column:1/3;}
+    .toast{
+      position:absolute;
+      left:50%;
+      bottom:88px;
+      transform:translateX(-50%);
+      background:rgba(38,54,72,.92);
+      color:#fff;
+      font-size:12px;
+      border-radius:999px;
+      padding:8px 14px;
+      z-index:70;
+      opacity:0;
+      pointer-events:none;
+      transition:opacity .2s ease, transform .2s ease;
+    }
+    .toast.show{
+      opacity:1;
+      transform:translateX(-50%) translateY(-4px);
+    }
   </style>
 </head>
 <body>
   <div class="app" id="app">
     <div class="topbar" id="topbar">
-      <div class="brand">🌿 FOOTPRINTS 像素成长</div>
-      <button class="icon-btn" id="bagBtn">🎒 背包</button>
+      <div class="top-row">
+        <div class="brand">🌿 FOOTPRINTS 像素成长</div>
+        <div class="tiny" id="topLevelText">Lv.3 · 120/200</div>
+      </div>
+      <div class="xp-top"><div class="fill" id="topXpBar"></div></div>
     </div>
 
     <div class="content">
@@ -461,22 +385,32 @@
           <div class="sun"></div>
           <div class="cloud" style="left:18px;top:30px;"></div>
           <div class="cloud" style="left:98px;top:58px;transform:scale(.8);"></div>
-          <div class="scene-top">
-            <div class="chip">☀️ 晴天·白天</div>
+          <div class="scene-overlay-info">
+            <div class="chip" id="weatherChip">☀️ 晴天·白天</div>
             <div class="chip" id="xpChip">Lv.3 · 120/200</div>
           </div>
+          <div class="home-side-actions">
+            <button class="home-action" data-home-action="bag"><div class="i">🎒</div>背包</button>
+            <button class="home-action" data-home-action="friend"><div class="i">👫</div>好友</button>
+            <button class="home-action" data-home-action="wardrobe"><div class="i">👗</div>衣柜</button>
+            <button class="home-action" data-home-action="scene"><div class="i">🌄</div>场景</button>
+          </div>
           <div class="avatar-wrap" id="homeAvatar">
-            <div class="ac-sprite ac-stand" aria-label="viya sprite"></div>
+            <canvas id="homeGirlCanvas" class="pixel-canvas" width="256" height="256" aria-label="viya sprite"></canvas>
             <div class="name-tag">viya</div>
           </div>
           <div class="flowers"></div>
-          <div class="level-box">
-            <div class="level-line"><span>成长经验</span><span id="xpText">120/200</span></div>
-            <div class="bar"><div class="fill" id="xpBar"></div></div>
+        </div>
+        <div class="home-bottom">
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <h3 class="title" style="margin:0;">今日成长状态</h3>
+              <span class="tiny" id="xpText">120/200</span>
+            </div>
+            <div class="bar" style="margin-top:6px;"><div class="fill" id="xpBar"></div></div>
+            <p class="tiny" style="margin:8px 0 0;">晴天白天，花海风吹得刚刚好，继续冲刺吧。</p>
           </div>
-          <div class="scene-bottom">
-            <button class="btn" id="focusBtn">进入自律时钟（30分钟）</button>
-          </div>
+          <button class="btn" id="focusBtn">进入自律时钟（30分钟）</button>
         </div>
       </section>
 
@@ -514,6 +448,17 @@
         <div class="card">
           <h3 class="title">成就联动提示</h3>
           <p class="tiny">灰色未解锁成就可点击查看条件，并一键加入我的任务。</p>
+          <div class="ach-toolbar">
+            <div class="ach-tabs">
+              <button class="ach-tab-btn active" id="taskAchTabUn">未达成</button>
+              <button class="ach-tab-btn" id="taskAchTabDone">已达成</button>
+            </div>
+            <div class="ach-pager">
+              <button class="pager-btn" id="taskAchPrev">◀</button>
+              <span class="pager-info" id="taskAchPageInfo">1/1</span>
+              <button class="pager-btn" id="taskAchNext">▶</button>
+            </div>
+          </div>
           <div class="ach-grid" id="taskAchGrid"></div>
         </div>
       </section>
@@ -538,7 +483,28 @@
 
       <section class="page" id="profilePage">
         <div class="card">
+          <h3 class="title">资料编辑</h3>
+          <div class="profile-form">
+            <input id="profileNickname" class="input full" placeholder="昵称" />
+            <input id="profileGender" class="input" placeholder="性别" />
+            <input id="profileBirthday" class="input" placeholder="生日（例：2000-01-01）" />
+            <input id="profileMbti" class="input full" placeholder="MBTI（例：ENFP）" />
+          </div>
+          <button class="mini-btn" id="saveProfileBtn" style="margin-top:8px;">保存资料</button>
+        </div>
+        <div class="card">
           <h3 class="title">成就展览柜</h3>
+          <div class="ach-toolbar">
+            <div class="ach-tabs">
+              <button class="ach-tab-btn active" id="profileAchTabTask">任务获得</button>
+              <button class="ach-tab-btn" id="profileAchTabEvent">特定活动获得</button>
+            </div>
+            <div class="ach-pager">
+              <button class="pager-btn" id="profileAchPrev">◀</button>
+              <span class="pager-info" id="profileAchPageInfo">1/1</span>
+              <button class="pager-btn" id="profileAchNext">▶</button>
+            </div>
+          </div>
           <div class="ach-grid" id="profileAchGrid"></div>
           <button class="btn" id="shareAllBtn" style="margin-top:10px;">一键分享展览柜（朋友圈/小红书）</button>
         </div>
@@ -564,6 +530,18 @@
       <div id="wardrobePanel" style="margin-top:10px;"></div>
       <div id="scenePanel" class="hidden" style="margin-top:10px;"></div>
     </div>
+    <div class="friend-panel" id="friendPanel">
+      <div class="bag-top">
+        <h3 class="title" style="margin:0;">👫 好友</h3>
+        <button class="mini-btn" id="friendCloseBtn">关闭</button>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <input id="friendNameInput" class="input" placeholder="输入好友昵称" />
+        <button class="mini-btn" id="addFriendBtn">添加</button>
+      </div>
+      <p class="tiny" id="friendStats" style="margin-top:8px;"></p>
+      <div id="friendList" style="margin-top:8px;"></div>
+    </div>
 
     <div class="focus-layer" id="focusLayer">
       <div class="cloud" style="left:18px;top:28px;"></div>
@@ -576,7 +554,7 @@
         </svg>
       </div>
       <div class="focus-avatar-wrap">
-        <div class="ac-sprite ac-meditate" aria-label="viya meditate sprite"></div>
+        <canvas id="focusGirlCanvas" class="focus-pixel-canvas" width="256" height="256" aria-label="viya meditate sprite"></canvas>
       </div>
       <div class="focus-time" id="focusTime">30:00</div>
       <div class="focus-end"><button class="btn" id="focusEndBtn">结束专注</button></div>
@@ -589,11 +567,18 @@
         <button class="btn" id="modalOkBtn">知道啦</button>
       </div>
     </div>
+    <div class="toast" id="toast"></div>
   </div>
 
   <script>
     const state = {
-      user:{ name:"viya", level:3, xp:120, xpMax:200, shards:6, weather:"晴天·白天", outfit:"森林校服", scene:"花海" },
+      user:{ name:"viya", level:3, xp:120, xpMax:200, shards:6, weather:"晴天·白天", outfit:"蓝色裙子", scene:"花海" },
+      profile:{ nickname:"viya", gender:"女", birthday:"2000-01-01", mbti:"ENFP" },
+      social:{ visits:0 },
+      friends:[
+        { id:1, nickname:"A朋友", gender:"女", birthday:"03-09", mbti:"INFP", level:5, achievements:["晨跑达人","早睡守护者"], wardrobe:"星空斗篷", scene:"海边晨光" },
+        { id:2, nickname:"Milo", gender:"男", birthday:"07-22", mbti:"ISFJ", level:4, achievements:["阅读小能手"], wardrobe:"蓝色裙子", scene:"花海" }
+      ],
       firstGiftShown:false,
       systemTasks:[
         {id:"gre",name:"学习GRE单词100个",current:0,total:100,done:false,type:"progress"},
@@ -608,19 +593,44 @@
         {id:2,name:"整理书桌",progress:100,done:true,exp:4}
       ],
       editMode:false,
+      achUi:{
+        taskTab:"undone",
+        taskPage:0,
+        profileTab:"task",
+        profilePage:0,
+        pageSize:4
+      },
       achievements:[
-        {id:"a1",name:"天鹅颈卷王",desc:"完成30天天鹅颈跟练打卡",icon:"🦢",unlocked:true},
-        {id:"a2",name:"早睡结界师",desc:"连续27天12点前睡觉",icon:"🌙",unlocked:true},
-        {id:"a3",name:"步行冒险家",desc:"连续15天步数达到5000",icon:"👟",unlocked:false,condition:"连续15天步数达到5000"},
-        {id:"a4",name:"学习点灯人",desc:"连续20天学习GRE 100词",icon:"📚",unlocked:false,condition:"连续20天完成GRE单词100个"}
+        {id:"a1",name:"天鹅颈卷王",desc:"完成30天天鹅颈跟练打卡",icon:"🦢",unlocked:true,source:"task"},
+        {id:"a2",name:"早睡结界师",desc:"连续27天12点前睡觉",icon:"🌙",unlocked:true,source:"task"},
+        {id:"a3",name:"步行冒险家",desc:"连续15天步数达到5000",icon:"👟",unlocked:false,condition:"连续15天步数达到5000",source:"task"},
+        {id:"a4",name:"学习点灯人",desc:"连续20天学习GRE 100词",icon:"📚",unlocked:false,condition:"连续20天完成GRE单词100个",source:"task"},
+        {id:"a5",name:"人气之星",desc:"拥有10个好友",icon:"🌟",unlocked:false,condition:"拥有10个好友",source:"event"},
+        {id:"a6",name:"热心访客",desc:"拜访20次好友",icon:"🤝",unlocked:false,condition:"拜访20次好友",source:"event"},
+        {id:"a7",name:"晨光签到官",desc:"连续7天完成晨间打卡",icon:"🌅",unlocked:false,condition:"连续7天完成晨间打卡",source:"task"},
+        {id:"a8",name:"阅读收藏家",desc:"累计阅读时长达1000分钟",icon:"📖",unlocked:false,condition:"累计阅读1000分钟",source:"task"},
+        {id:"a9",name:"节日策划师",desc:"参与3次特定活动主题任务",icon:"🎉",unlocked:false,condition:"参与3次特定活动",source:"event"},
+        {id:"a10",name:"花海摄影师",desc:"解锁并使用3种场景皮肤",icon:"📸",unlocked:false,condition:"解锁并使用3种场景",source:"event"}
       ],
       calendarChecks:new Set(),
       events:[],
       bag:{
+        wardrobeCategory:"发型",
         wardrobe:[
-          {id:"w1",name:"森林校服",owned:true,equipped:true,preview:"清新绿色系"},
-          {id:"w2",name:"星空斗篷",owned:false,fragments:6,need:10,preview:"夜空蓝闪光风"},
-          {id:"w3",name:"樱花和服",owned:false,fragments:10,need:10,preview:"粉白花瓣风"}
+          {id:"h1",category:"发型",name:"丸子头",owned:true,equipped:true,preview:"初始发型，清爽可爱"},
+          {id:"h2",category:"发型",name:"双马尾",owned:false,fragments:4,need:10,preview:"活力元气风"},
+          {id:"c1",category:"上下装",name:"蓝色裙子",owned:true,equipped:true,preview:"默认穿戴，软萌蓝裙"},
+          {id:"c2",category:"上下装",name:"星空连衣裙",owned:false,fragments:7,need:10,preview:"夜空渐变裙摆"},
+          {id:"s1",category:"袜子",name:"无",owned:true,equipped:true,preview:"当前未穿袜子"},
+          {id:"s2",category:"袜子",name:"白蕾丝短袜",owned:false,fragments:3,need:10,preview:"轻甜风短袜"},
+          {id:"sh1",category:"鞋子",name:"棕色皮鞋",owned:true,equipped:true,preview:"默认皮鞋，百搭"},
+          {id:"sh2",category:"鞋子",name:"樱桃小靴",owned:false,fragments:8,need:10,preview:"圆头短靴"},
+          {id:"a1",category:"饰品-妆容",name:"黄色小花",owned:true,equipped:true,preview:"默认佩戴在发间"},
+          {id:"a2",category:"饰品-妆容",name:"星星腮红",owned:false,fragments:6,need:10,preview:"软糯妆感"},
+          {id:"e1",category:"表情",name:"元气微笑",owned:true,equipped:true,preview:"默认表情"},
+          {id:"e2",category:"表情",name:"星星眼",owned:false,fragments:9,need:10,preview:"闪亮心情"},
+          {id:"l1",category:"限定套装",name:"春日花语套装",owned:false,fragments:5,need:10,preview:"限定季节款"},
+          {id:"l2",category:"限定套装",name:"海风假日套装",owned:false,fragments:2,need:10,preview:"限定海岛风"}
         ],
         scenes:[
           {id:"s1",name:"花海",owned:true,equipped:true,preview:"默认晴天花海"},
@@ -640,6 +650,109 @@
     const $ = (id) => document.getElementById(id);
     const pages = { home:$("homePage"), task:$("taskPage"), calendar:$("calendarPage"), profile:$("profilePage") };
 
+    function drawPixelGirl(canvasId, mode="stand"){
+      const canvas = $(canvasId);
+      if(!canvas) return;
+      const ctx = canvas.getContext("2d");
+      ctx.imageSmoothingEnabled = false;
+
+      const P = {
+        skin:"#FFE4C4", skinLight:"#FFF0DC", skinShadow:"#F5C9A8",
+        hairMain:"#8B6B4A", hairDark:"#6B4F35", hairLight:"#A88664",
+        dressMain:"#7EC8E3", dressLight:"#A8DFF0", dressDark:"#5BA3C9", dressAccent:"#D4EFF7", whiteTrim:"#FEFEFE",
+        shoe:"#C4956A", shoeDark:"#A07050",
+        flowerYellow:"#FFD93D", flowerOrange:"#FFB347", leafGreen:"#7CB77C",
+        eyeBlack:"#3A3A3A", eyeWhite:"#FFFFFF", blush:"#FFB6B0"
+      };
+      const px = (x,y,w,h,c)=>{ ctx.fillStyle=c; ctx.fillRect(x,y,w,h); };
+      ctx.clearRect(0,0,256,256);
+
+      // 身体基础（参考你给的蓝裙豆豆眼风格）
+      if(mode === "stand"){
+        px(112,190,14,42,P.skin); px(112,200,14,32,P.skinLight); px(108,224,22,8,P.shoeDark); px(110,222,18,12,P.shoe); px(112,226,6,4,"#D4A878");
+        px(130,190,14,42,P.skin); px(130,200,14,32,P.skinLight); px(126,224,22,8,P.shoeDark); px(128,222,18,12,P.shoe); px(130,226,6,4,"#D4A878");
+      }else{
+        // 冥想盘腿
+        px(102,214,24,11,P.dressDark); px(130,214,24,11,P.dressDark);
+        px(98,220,30,12,P.shoeDark); px(128,220,30,12,P.shoeDark);
+        px(108,222,18,10,P.shoe); px(130,222,18,10,P.shoe);
+      }
+
+      px(116,168,24,18,P.skinLight);
+      for(let y=168;y<186;y++){ for(let x=112;x<144;x++){ px(x,y,1,1,P.dressMain);} }
+      px(118,170,4,14,P.dressLight); px(134,170,4,14,P.dressLight);
+      for(let y=186;y<212;y++){
+        const width = 24 + (y - 186) * 1.8;
+        for(let x=128-width/2; x<128+width/2; x++){
+          let c = P.dressMain;
+          if(y>200) c = P.dressDark;
+          if((x+y)%6===0) c = P.dressLight;
+          if(y>206 && (x<108 || x>148)) c = P.dressAccent;
+          px(x,y,1,1,c);
+        }
+      }
+      for(let x=100;x<156;x+=2){ if(x>104 && x<152) px(x,208,2,3,P.whiteTrim); }
+      px(122,190,12,4,P.dressAccent); px(120,188,16,2,P.whiteTrim); px(120,166,16,4,P.whiteTrim); px(118,168,4,3,P.whiteTrim); px(134,168,4,3,P.whiteTrim);
+      px(124,170,8,6,"#F9C7D3"); px(126,172,4,4,"#F0A5B8");
+
+      if(mode === "stand"){
+        px(104,172,10,8,P.skin); px(98,176,8,10,P.skin); px(96,184,6,8,P.skinShadow);
+        px(142,172,10,8,P.skin); px(150,176,8,10,P.skin); px(154,184,6,8,P.skinShadow);
+        px(94,190,6,5,P.skin); px(156,190,6,5,P.skin);
+      }else{
+        // 冥想时双臂向内合十感
+        px(110,178,10,8,P.skin); px(136,178,10,8,P.skin);
+        px(118,184,8,8,P.skin); px(130,184,8,8,P.skin);
+      }
+      px(112,176,6,12,P.dressDark); px(138,176,6,12,P.dressDark);
+      px(158,190,5,5,P.flowerYellow); px(160,192,3,3,P.flowerOrange); px(162,196,3,2,P.leafGreen);
+
+      for(let y=156;y<168;y++){ for(let x=123;x<133;x++) px(x,y,1,1,P.skin); }
+
+      // 头部
+      for(let y=123;y<179;y++){
+        for(let x=104;x<152;x++){
+          const dx=x-128, dy=y-151;
+          if(dx*dx/300 + dy*dy/240 < 1.0){
+            let c=P.skin;
+            if(y>163 && Math.abs(dx)>15) c=P.skinShadow;
+            px(x,y,1,1,c);
+          }
+        }
+      }
+      for(let y=133;y<143;y++){ for(let x=110;x<120;x++){ if((x-115)*(x-115)+(y-138)*(y-138)<20) px(x,y,1,1,P.skinLight); } }
+      for(let y=133;y<143;y++){ for(let x=136;x<146;x++){ if((x-141)*(x-141)+(y-138)*(y-138)<20) px(x,y,1,1,P.skinLight); } }
+      px(108,149,8,5,P.blush); px(110,151,6,3,"#FFC8C0"); px(140,149,8,5,P.blush); px(142,151,6,3,"#FFC8C0");
+
+      for(let y=111;y<139;y++){ for(let x=104;x<152;x++){ const dx=x-128, dy=y-125; if(dx*dx/360+dy*dy/170<1.0) px(x,y,1,1,P.hairDark);} }
+      for(let y=119;y<139;y++){
+        for(let x=108;x<148;x++){
+          if((y<129 && x>114 && x<142) || (y>=129 && y<135 && x>112 && x<144)){
+            let c=P.hairMain; if((x+y)%4===0) c=P.hairLight; px(x,y,1,1,c);
+          }
+        }
+      }
+      for(let y=129;y<155;y++){ for(let x=104;x<114;x++){ if(x>106) px(x,y,1,1,P.hairMain);} }
+      for(let y=129;y<155;y++){ for(let x=142;x<152;x++){ if(x<150) px(x,y,1,1,P.hairMain);} }
+      for(let y=105;y<121;y++){ for(let x=96;x<116;x++){ if((x-106)*(x-106)+(y-113)*(y-113)<42) px(x,y,1,1,P.hairMain);} }
+      for(let y=105;y<121;y++){ for(let x=140;x<160;x++){ if((x-150)*(x-150)+(y-113)*(y-113)<42) px(x,y,1,1,P.hairMain);} }
+      px(102,109,4,2,P.hairLight); px(148,109,4,2,P.hairLight);
+      for(let dy=-4;dy<=4;dy++){ for(let dx=-4;dx<=4;dx++){ if(dx*dx+dy*dy<=14 && !(dx===0&&dy===0)) px(112+dx,109+dy,1,1,P.flowerYellow);} }
+      px(112,109,2,2,P.flowerOrange); px(116,111,4,2,P.leafGreen);
+
+      // 豆豆眼：专注时改闭眼
+      if(mode === "stand"){
+        px(116,141,6,6,P.eyeWhite); px(117,142,4,4,P.eyeBlack); px(117,141,2,2,P.eyeWhite);
+        px(134,141,6,6,P.eyeWhite); px(135,142,4,4,P.eyeBlack); px(135,141,2,2,P.eyeWhite);
+      }else{
+        px(116,144,7,2,P.eyeBlack); px(133,144,7,2,P.eyeBlack);
+      }
+      px(114,147,4,2,"#FFC8C0"); px(138,147,4,2,"#FFC8C0");
+      px(124,155,8,3,"#E88B7A"); px(126,157,4,2,"#F0A090");
+      px(126,151,2,1,"#E8B89A");
+      for(let y=156;y<165;y++){ for(let x=118;x<138;x++) px(x,y,1,1,P.skin); }
+    }
+
     function openModal(title,desc,okText="知道啦"){
       $("modalTitle").textContent=title;
       $("modalDesc").textContent=desc;
@@ -649,6 +762,13 @@
     function closeModal(){ $("modalMask").classList.remove("show"); }
     $("modalOkBtn").onclick=closeModal;
     $("modalMask").onclick=(e)=>{ if(e.target.id==="modalMask") closeModal(); };
+    function showToast(text){
+      const t = $("toast");
+      t.textContent = text;
+      t.classList.add("show");
+      clearTimeout(showToast._timer);
+      showToast._timer = setTimeout(()=>t.classList.remove("show"), 1500);
+    }
 
     function gainXp(v){
       state.user.xp += v;
@@ -662,9 +782,18 @@
     function renderUser(){
       const p = Math.max(0,Math.min(100,(state.user.xp/state.user.xpMax)*100));
       $("xpBar").style.width = p + "%";
+      $("topXpBar").style.width = p + "%";
       $("xpText").textContent = `${state.user.xp}/${state.user.xpMax}`;
       $("xpChip").textContent = `Lv.${state.user.level} · ${state.user.xp}/${state.user.xpMax}`;
-      document.querySelector(".scene-top .chip").textContent = `☀️ ${state.user.weather}`;
+      $("topLevelText").textContent = `Lv.${state.user.level} · ${state.user.xp}/${state.user.xpMax}`;
+      $("weatherChip").textContent = `☀️ ${state.user.weather}`;
+    }
+
+    function updateSocialAchievements(){
+      const star = state.achievements.find(a=>a.id==="a5");
+      const visitor = state.achievements.find(a=>a.id==="a6");
+      if(star) star.unlocked = state.friends.length >= 10;
+      if(visitor) visitor.unlocked = state.social.visits >= 20;
     }
 
     function switchPage(key){
@@ -823,7 +952,21 @@
     function renderTaskAchievementLink(){
       const box = $("taskAchGrid");
       box.innerHTML = "";
-      state.achievements.forEach(a=>{
+      const isUndone = state.achUi.taskTab === "undone";
+      const list = state.achievements.filter(a=>isUndone ? !a.unlocked : a.unlocked);
+      const pageSize = state.achUi.pageSize;
+      const totalPages = Math.max(1, Math.ceil(list.length / pageSize));
+      state.achUi.taskPage = Math.min(state.achUi.taskPage, totalPages - 1);
+      const start = state.achUi.taskPage * pageSize;
+      const pageItems = list.slice(start, start + pageSize);
+
+      $("taskAchTabUn").classList.toggle("active", isUndone);
+      $("taskAchTabDone").classList.toggle("active", !isUndone);
+      $("taskAchPageInfo").textContent = `${state.achUi.taskPage + 1}/${totalPages}`;
+      $("taskAchPrev").disabled = state.achUi.taskPage <= 0;
+      $("taskAchNext").disabled = state.achUi.taskPage >= totalPages - 1;
+
+      pageItems.forEach(a=>{
         const d = document.createElement("div");
         d.className = "ach-item" + (a.unlocked ? "" : " locked");
         d.innerHTML = `<div class="ach-icon">${a.unlocked ? a.icon : "🔒"}</div><div class="tiny">${a.name}</div>`;
@@ -842,12 +985,29 @@
         };
         box.appendChild(d);
       });
+      if(pageItems.length===0){
+        box.innerHTML = `<div class="tiny">当前分类暂无成就</div>`;
+      }
     }
 
     function renderProfileAchievements(){
       const box = $("profileAchGrid");
       box.innerHTML = "";
-      state.achievements.forEach(a=>{
+      const currentType = state.achUi.profileTab;
+      const list = state.achievements.filter(a=>a.source===currentType);
+      const pageSize = state.achUi.pageSize;
+      const totalPages = Math.max(1, Math.ceil(list.length / pageSize));
+      state.achUi.profilePage = Math.min(state.achUi.profilePage, totalPages - 1);
+      const start = state.achUi.profilePage * pageSize;
+      const pageItems = list.slice(start, start + pageSize);
+
+      $("profileAchTabTask").classList.toggle("active", currentType==="task");
+      $("profileAchTabEvent").classList.toggle("active", currentType==="event");
+      $("profileAchPageInfo").textContent = `${state.achUi.profilePage + 1}/${totalPages}`;
+      $("profileAchPrev").disabled = state.achUi.profilePage <= 0;
+      $("profileAchNext").disabled = state.achUi.profilePage >= totalPages - 1;
+
+      pageItems.forEach(a=>{
         const d = document.createElement("div");
         d.className = "ach-item" + (a.unlocked ? "" : " locked");
         d.innerHTML = `
@@ -864,8 +1024,93 @@
         };
         box.appendChild(d);
       });
+      if(pageItems.length===0){
+        box.innerHTML = `<div class="tiny">当前分类暂无成就</div>`;
+      }
     }
     $("shareAllBtn").onclick=()=>openModal("展览柜分享", "已生成成就展览柜总览分享卡片（模拟）");
+    $("taskAchTabUn").onclick=()=>{ state.achUi.taskTab="undone"; state.achUi.taskPage=0; renderTaskAchievementLink(); };
+    $("taskAchTabDone").onclick=()=>{ state.achUi.taskTab="done"; state.achUi.taskPage=0; renderTaskAchievementLink(); };
+    $("taskAchPrev").onclick=()=>{ state.achUi.taskPage=Math.max(0, state.achUi.taskPage-1); renderTaskAchievementLink(); };
+    $("taskAchNext").onclick=()=>{
+      const list = state.achievements.filter(a=>state.achUi.taskTab==="undone" ? !a.unlocked : a.unlocked);
+      const total = Math.max(1, Math.ceil(list.length/state.achUi.pageSize));
+      state.achUi.taskPage=Math.min(total-1, state.achUi.taskPage+1);
+      renderTaskAchievementLink();
+    };
+    $("profileAchTabTask").onclick=()=>{ state.achUi.profileTab="task"; state.achUi.profilePage=0; renderProfileAchievements(); };
+    $("profileAchTabEvent").onclick=()=>{ state.achUi.profileTab="event"; state.achUi.profilePage=0; renderProfileAchievements(); };
+    $("profileAchPrev").onclick=()=>{ state.achUi.profilePage=Math.max(0, state.achUi.profilePage-1); renderProfileAchievements(); };
+    $("profileAchNext").onclick=()=>{
+      const list = state.achievements.filter(a=>a.source===state.achUi.profileTab);
+      const total = Math.max(1, Math.ceil(list.length/state.achUi.pageSize));
+      state.achUi.profilePage=Math.min(total-1, state.achUi.profilePage+1);
+      renderProfileAchievements();
+    };
+
+    function renderProfileForm(){
+      $("profileNickname").value = state.profile.nickname;
+      $("profileGender").value = state.profile.gender;
+      $("profileBirthday").value = state.profile.birthday;
+      $("profileMbti").value = state.profile.mbti;
+    }
+    $("saveProfileBtn").onclick=()=>{
+      state.profile.nickname = $("profileNickname").value.trim() || state.profile.nickname;
+      state.profile.gender = $("profileGender").value.trim() || state.profile.gender;
+      state.profile.birthday = $("profileBirthday").value.trim() || state.profile.birthday;
+      state.profile.mbti = $("profileMbti").value.trim() || state.profile.mbti;
+      state.user.name = state.profile.nickname;
+      const tag = document.querySelector("#homeAvatar .name-tag");
+      if(tag) tag.textContent = state.profile.nickname;
+      showToast("资料已保存");
+    };
+
+    function visitFriend(friend){
+      state.social.visits += 1;
+      gainXp(5);
+      updateSocialAchievements();
+      renderTaskAchievementLink();
+      renderProfileAchievements();
+      renderFriends();
+      showToast("帮助好友 +5经验");
+      openModal("好友主页", `昵称：${friend.nickname}
+性别：${friend.gender}
+生日：${friend.birthday}
+MBTI：${friend.mbti}
+等级：Lv.${friend.level}
+成就：${friend.achievements.join("、")}
+衣柜：${friend.wardrobe}
+场景：${friend.scene}`);
+    }
+
+    function renderFriends(){
+      $("friendStats").textContent = `好友数：${state.friends.length} ｜ 累计拜访：${state.social.visits}`;
+      const box = $("friendList");
+      box.innerHTML = "";
+      state.friends.forEach(f=>{
+        const row = document.createElement("div");
+        row.className = "item-row";
+        row.innerHTML = `
+          <div style="display:flex;justify-content:space-between;gap:8px;align-items:center;">
+            <div>
+              <div class="item-title">👤 ${f.nickname}</div>
+              <div class="tiny">Lv.${f.level} · ${f.mbti}</div>
+            </div>
+            <div class="actions">
+              <button class="mini-btn" data-view="${f.id}">拜访</button>
+            </div>
+          </div>
+        `;
+        box.appendChild(row);
+      });
+      box.querySelectorAll("[data-view]").forEach(btn=>{
+        btn.onclick=()=>{
+          const id = Number(btn.dataset.view);
+          const friend = state.friends.find(f=>f.id===id);
+          visitFriend(friend);
+        };
+      });
+    }
 
     function renderCalendar(){
       const now = new Date();
@@ -935,7 +1180,15 @@
     function renderWardrobe(){
       const box = $("wardrobePanel");
       box.innerHTML = "";
-      state.bag.wardrobe.forEach(item=>{
+      const categories = ["发型","上下装","袜子","鞋子","饰品-妆容","表情","限定套装"];
+      const catWrap = document.createElement("div");
+      catWrap.className = "wardrobe-cats";
+      catWrap.innerHTML = categories.map(c=>`<button class="wardrobe-cat ${state.bag.wardrobeCategory===c?"active":""}" data-wcat="${c}">${c}</button>`).join("");
+      box.appendChild(catWrap);
+
+      const currentCategory = state.bag.wardrobeCategory;
+      const list = state.bag.wardrobe.filter(item=>item.category===currentCategory);
+      list.forEach(item=>{
         const canClaim = !item.owned && item.fragments>=item.need;
         const div = document.createElement("div");
         div.className = "item-row " + (item.owned ? "owned" : "");
@@ -943,6 +1196,7 @@
           <div class="item-title">👗 ${item.name} ${item.equipped?"（已穿戴）":""}</div>
           <div class="tiny">${item.preview}</div>
           <div class="tiny" style="margin-top:5px;">${item.owned ? "已拥有，可点击穿戴" : `碎片 ${item.fragments}/${item.need}`}</div>
+          ${item.owned ? "" : `<div class="wardrobe-hint">完成每日任务随机获得碎片</div>`}
           <div class="actions" style="margin-top:8px;">
             <button class="mini-btn" data-preview-w="${item.id}">预览</button>
             ${item.owned ? `<button class="mini-btn" data-equip-w="${item.id}">穿戴</button>` :
@@ -952,6 +1206,12 @@
         box.appendChild(div);
       });
 
+      box.querySelectorAll("[data-wcat]").forEach(btn=>{
+        btn.onclick=()=>{
+          state.bag.wardrobeCategory = btn.dataset.wcat;
+          renderWardrobe();
+        };
+      });
       box.querySelectorAll("[data-preview-w]").forEach(b=>{
         b.onclick=()=>openModal("衣服预览", "已切换预览效果（模拟）");
       });
@@ -970,10 +1230,12 @@
       box.querySelectorAll("[data-equip-w]").forEach(b=>{
         b.onclick=()=>{
           const id = b.dataset.equipW;
-          state.bag.wardrobe.forEach(i=>i.equipped=false);
           const i = state.bag.wardrobe.find(x=>x.id===id);
+          state.bag.wardrobe
+            .filter(x=>x.category===i.category)
+            .forEach(x=>x.equipped=false);
           i.equipped = true;
-          state.user.outfit = i.name;
+          if(i.category==="上下装") state.user.outfit = i.name;
           openModal("穿戴成功", `当前穿戴：${i.name}`);
           renderWardrobe();
         };
@@ -1041,8 +1303,54 @@
       }
     }
 
-    $("bagBtn").onclick=()=>{ $("bagPanel").classList.add("show"); };
+    function openBagTab(tabName){
+      $("bagPanel").classList.add("show");
+      if(tabName === "scene"){
+        state.bag.tab="scene";
+        $("scenePanel").classList.remove("hidden");
+        $("wardrobePanel").classList.add("hidden");
+        $("sceneTabBtn").classList.add("active");
+        $("wardrobeTabBtn").classList.remove("active");
+      }else{
+        state.bag.tab="wardrobe";
+        $("wardrobePanel").classList.remove("hidden");
+        $("scenePanel").classList.add("hidden");
+        $("wardrobeTabBtn").classList.add("active");
+        $("sceneTabBtn").classList.remove("active");
+      }
+    }
+    document.querySelectorAll("[data-home-action]").forEach(btn=>{
+      btn.onclick=()=>{
+        const a = btn.dataset.homeAction;
+        if(a==="bag") openBagTab("wardrobe");
+        if(a==="friend"){ $("friendPanel").classList.add("show"); renderFriends(); }
+        if(a==="wardrobe") openBagTab("wardrobe");
+        if(a==="scene") openBagTab("scene");
+      };
+    });
     $("bagCloseBtn").onclick=()=>{ $("bagPanel").classList.remove("show"); };
+    $("friendCloseBtn").onclick=()=>{ $("friendPanel").classList.remove("show"); };
+    $("addFriendBtn").onclick=()=>{
+      const name = $("friendNameInput").value.trim();
+      if(!name) return;
+      state.friends.push({
+        id:Date.now(),
+        nickname:name,
+        gender:"未知",
+        birthday:"未设置",
+        mbti:"未设置",
+        level:Math.floor(Math.random()*5)+2,
+        achievements:["新朋友"],
+        wardrobe:"蓝色裙子",
+        scene:"花海"
+      });
+      $("friendNameInput").value = "";
+      updateSocialAchievements();
+      renderTaskAchievementLink();
+      renderProfileAchievements();
+      renderFriends();
+      showToast("添加好友成功");
+    };
     $("wardrobeTabBtn").onclick=()=>{
       state.bag.tab="wardrobe";
       $("wardrobePanel").classList.remove("hidden");
@@ -1070,7 +1378,8 @@
       $("focusLayer").classList.add("show");
       $("topbar").classList.add("hidden");
       $("tabs").classList.add("hidden");
-      $("bagBtn").classList.add("hidden");
+      $("bagPanel").classList.remove("show");
+      $("friendPanel").classList.remove("show");
       updateFocusUI();
       if(state.focus.timer) clearInterval(state.focus.timer);
       state.focus.timer = setInterval(()=>{
@@ -1098,7 +1407,6 @@
       $("focusLayer").classList.remove("show");
       $("topbar").classList.remove("hidden");
       $("tabs").classList.remove("hidden");
-      $("bagBtn").classList.remove("hidden");
       if(state.focus.timer){ clearInterval(state.focus.timer); state.focus.timer=null; }
       switchPage("home");
     }
@@ -1118,7 +1426,11 @@
     }
 
     function init(){
+      drawPixelGirl("homeGirlCanvas", "stand");
+      drawPixelGirl("focusGirlCanvas", "meditate");
+      updateSocialAchievements();
       renderUser();
+      renderProfileForm();
       renderSystemTasks();
       renderCustomTasks();
       renderTaskAchievementLink();
@@ -1126,6 +1438,7 @@
       renderCalendar();
       renderEvents();
       renderBag();
+      renderFriends();
       setTimeout(showDailyGift,300);
     }
     init();
