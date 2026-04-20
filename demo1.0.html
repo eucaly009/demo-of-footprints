@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FOOTPRINTS Demo 1.0</title>
+  <style>
+    :root{
+      --primary:#88B8E8;
+      --bg:#eff7ff;
+      --text:#2e3b48;
+      --muted:#6e7a86;
+      --card:#ffffff;
+      --pink:#f4b6d0;
+      --orange:#f8c27b;
+      --green:#7cc895;
+      --shadow:0 8px 18px rgba(80,120,160,.16);
+      --radius:18px;
+    }
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+    html,body{margin:0;background:linear-gradient(180deg,#f8fcff,#edf6ff);font-family:"PingFang SC","Microsoft YaHei",sans-serif;color:var(--text);}
+    body{display:flex;justify-content:center;padding:10px;}
+    .app{
+      width:min(100%,430px);
+      min-height:calc(100vh - 20px);
+      background:var(--bg);
+      border-radius:26px;
+      overflow:hidden;
+      border:2px solid rgba(136,184,232,.45);
+      box-shadow:0 14px 28px rgba(70,110,150,.2);
+      position:relative;
+    }
+    .hidden{display:none !important;}
+    .topbar{
+      height:56px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:0 12px;
+      background:linear-gradient(180deg,#c8e2fb,#b7d8f7);
+      border-bottom:2px dashed rgba(46,59,72,.18);
+    }
+    .brand{font-weight:800;letter-spacing:.5px;font-size:15px;}
+    .icon-btn{
+      border:0;background:#fff;color:#2d5578;border-radius:12px;padding:7px 10px;
+      font-weight:700;box-shadow:var(--shadow);cursor:pointer;transition:.12s transform,.12s filter;
+    }
+    .icon-btn:active,.btn:active,.tab:active,.chip:active{transform:scale(.96);filter:brightness(.96);}
+    .content{padding:10px 12px 84px;}
+    .page{display:none;animation:fade .2s ease;}
+    .page.active{display:block;}
+    @keyframes fade{from{opacity:.2;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+    .card{
+      background:var(--card);border-radius:var(--radius);padding:12px;border:2px solid rgba(136,184,232,.35);
+      box-shadow:var(--shadow);margin-bottom:10px;
+    }
+    .title{margin:0 0 8px;font-size:15px;font-weight:800;}
+    .tiny{font-size:12px;color:var(--muted);}
+    .bar{height:11px;background:#dcebf9;border-radius:999px;overflow:hidden;border:1px solid rgba(46,59,72,.2);}
+    .fill{height:100%;background:linear-gradient(90deg,#7cc895,#72b7ff);width:0%;transition:width .4s ease;}
+    .scene{
+      height:430px;border-radius:20px;position:relative;overflow:hidden;
+      background:linear-gradient(180deg,#bfe4ff 0%,#d8edff 38%,#9ad08f 39%,#7ac36f 100%);
+      border:2px solid rgba(136,184,232,.4);
+      box-shadow:var(--shadow);
+    }
+    .sun{position:absolute;right:16px;top:20px;width:44px;height:44px;border-radius:50%;background:#ffe28c;box-shadow:0 0 0 6px rgba(255,226,140,.28);}
+    .cloud{position:absolute;background:#fff;border-radius:20px;height:18px;width:58px;opacity:.9;}
+    .cloud:before,.cloud:after{content:"";position:absolute;background:#fff;border-radius:50%;}
+    .cloud:before{width:20px;height:20px;left:8px;top:-8px;}
+    .cloud:after{width:24px;height:24px;right:8px;top:-11px;}
+    .flowers{
+      position:absolute;inset:auto 0 0 0;height:47%;
+      background:
+      radial-gradient(circle at 8% 60%,#ffb8d2 0 7px,transparent 8px),
+      radial-gradient(circle at 21% 40%,#ffd1a6 0 6px,transparent 7px),
+      radial-gradient(circle at 35% 65%,#f5b4ff 0 8px,transparent 9px),
+      radial-gradient(circle at 53% 38%,#fff2a9 0 6px,transparent 7px),
+      radial-gradient(circle at 70% 63%,#ffb8d2 0 8px,transparent 9px),
+      radial-gradient(circle at 84% 50%,#c8b8ff 0 7px,transparent 8px),
+      linear-gradient(180deg,#87cb79,#6bbf61);
+    }
+    /* 动森感：使用“点阵像素精灵图（box-shadow）”绘制角色 */
+    .avatar-wrap{
+      position:absolute;
+      left:50%;
+      top:56%;
+      transform:translate(-50%,-50%);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:10px;
+      z-index:3;
+      pointer-events:none;
+    }
+
+    .ac-sprite{
+      --px: 7px; /* 像素块尺寸（越大越像“点阵”） */
+      --ol:#283241;     /* 描边/发色深 */
+      --hair:#6a4a3f;
+      --hair2:#7a5649;
+      --skin:#ffe7d6;
+      --cheek:#ffb7c8;
+      --dress:#88B8E8;
+      --dress2:#6aa7dd;
+      --sock:#ffffff;
+      --shoe:#5a4038;
+      width:calc(18 * var(--px));
+      height:calc(24 * var(--px));
+      position:relative;
+      image-rendering:pixelated;
+      image-rendering:crisp-edges;
+      filter:drop-shadow(0 10px 0 rgba(0,0,0,.10));
+      transform:scale(1.05);
+    }
+
+    .ac-sprite::after{
+      content:"";
+      position:absolute;
+      left:50%;
+      bottom:calc(-1.2 * var(--px));
+      transform:translateX(-50%);
+      width:calc(14 * var(--px));
+      height:calc(3.2 * var(--px));
+      background:rgba(0,0,0,.12);
+      border-radius:999px;
+      filter:blur(.2px);
+    }
+
+    .ac-sprite::before{
+      content:"";
+      position:absolute;
+      left:0; top:0;
+      width:var(--px);
+      height:var(--px);
+      box-shadow:
+        /* 站立像素小女孩（18x24） */
+        /* 头发外轮廓 */
+        calc(6*var(--px)) calc(0*var(--px)) var(--ol),
+        calc(7*var(--px)) calc(0*var(--px)) var(--ol),
+        calc(8*var(--px)) calc(0*var(--px)) var(--ol),
+        calc(5*var(--px)) calc(1*var(--px)) var(--ol),
+        calc(6*var(--px)) calc(1*var(--px)) var(--hair),
+        calc(7*var(--px)) calc(1*var(--px)) var(--hair),
+        calc(8*var(--px)) calc(1*var(--px)) var(--hair),
+        calc(9*var(--px)) calc(1*var(--px)) var(--ol),
+        calc(4*var(--px)) calc(2*var(--px)) var(--ol),
+        calc(5*var(--px)) calc(2*var(--px)) var(--hair),
+        calc(6*var(--px)) calc(2*var(--px)) var(--hair),
+        calc(7*var(--px)) calc(2*var(--px)) var(--hair2),
+        calc(8*var(--px)) calc(2*var(--px)) var(--hair),
+        calc(9*var(--px)) calc(2*var(--px)) var(--hair),
+        calc(10*var(--px)) calc(2*var(--px)) var(--ol),
+        /* 发梢两侧 */
+        calc(3*var(--px)) calc(3*var(--px)) var(--ol),
+        calc(4*var(--px)) calc(3*var(--px)) var(--hair),
+        calc(10*var(--px)) calc(3*var(--px)) var(--hair),
+        calc(11*var(--px)) calc(3*var(--px)) var(--ol),
+        calc(3*var(--px)) calc(4*var(--px)) var(--ol),
+        calc(4*var(--px)) calc(4*var(--px)) var(--hair),
+        calc(5*var(--px)) calc(4*var(--px)) var(--hair),
+        calc(9*var(--px)) calc(4*var(--px)) var(--hair),
+        calc(10*var(--px)) calc(4*var(--px)) var(--hair),
+        calc(11*var(--px)) calc(4*var(--px)) var(--ol),
+        /* 脸轮廓 */
+        calc(4*var(--px)) calc(5*var(--px)) var(--ol),
+        calc(5*var(--px)) calc(5*var(--px)) var(--skin),
+        calc(6*var(--px)) calc(5*var(--px)) var(--skin),
+        calc(7*var(--px)) calc(5*var(--px)) var(--skin),
+        calc(8*var(--px)) calc(5*var(--px)) var(--skin),
+        calc(9*var(--px)) calc(5*var(--px)) var(--skin),
+        calc(10*var(--px)) calc(5*var(--px)) var(--ol),
+        calc(4*var(--px)) calc(6*var(--px)) var(--ol),
+        calc(5*var(--px)) calc(6*var(--px)) var(--skin),
+        calc(6*var(--px)) calc(6*var(--px)) var(--skin),
+        calc(7*var(--px)) calc(6*var(--px)) var(--skin),
+        calc(8*var(--px)) calc(6*var(--px)) var(--skin),
+        calc(9*var(--px)) calc(6*var(--px)) var(--skin),
+        calc(10*var(--px)) calc(6*var(--px)) var(--ol),
+        calc(4*var(--px)) calc(7*var(--px)) var(--ol),
+        calc(5*var(--px)) calc(7*var(--px)) var(--skin),
+        calc(6*var(--px)) calc(7*var(--px)) #ffffff,
+        calc(7*var(--px)) calc(7*var(--px)) var(--skin),
+        calc(8*var(--px)) calc(7*var(--px)) var(--skin),
+        calc(9*var(--px)) calc(7*var(--px)) #ffffff,
+        calc(10*var(--px)) calc(7*var(--px)) var(--skin),
+        calc(11*var(--px)) calc(7*var(--px)) var(--ol),
+        /* 眼珠 */
+        calc(6*var(--px)) calc(8*var(--px)) var(--ol),
+        calc(9*var(--px)) calc(8*var(--px)) var(--ol),
+        /* 腮红 */
+        calc(5*var(--px)) calc(9*var(--px)) var(--cheek),
+        calc(10*var(--px)) calc(9*var(--px)) var(--cheek),
+        /* 嘴 */
+        calc(7*var(--px)) calc(10*var(--px)) #c87878,
+        calc(8*var(--px)) calc(10*var(--px)) #c87878,
+        /* 下巴 */
+        calc(5*var(--px)) calc(11*var(--px)) var(--ol),
+        calc(6*var(--px)) calc(11*var(--px)) var(--skin),
+        calc(7*var(--px)) calc(11*var(--px)) var(--skin),
+        calc(8*var(--px)) calc(11*var(--px)) var(--skin),
+        calc(9*var(--px)) calc(11*var(--px)) var(--skin),
+        calc(10*var(--px)) calc(11*var(--px)) var(--ol),
+        /* 身体（裙子） */
+        calc(5*var(--px)) calc(12*var(--px)) var(--ol),
+        calc(6*var(--px)) calc(12*var(--px)) var(--dress),
+        calc(7*var(--px)) calc(12*var(--px)) var(--dress),
+        calc(8*var(--px)) calc(12*var(--px)) var(--dress),
+        calc(9*var(--px)) calc(12*var(--px)) var(--dress),
+        calc(10*var(--px)) calc(12*var(--px)) var(--ol),
+        /* 手臂 */
+        calc(4*var(--px)) calc(13*var(--px)) var(--skin),
+        calc(11*var(--px)) calc(13*var(--px)) var(--skin),
+        /* 裙身加深 */
+        calc(6*var(--px)) calc(13*var(--px)) var(--dress),
+        calc(7*var(--px)) calc(13*var(--px)) var(--dress),
+        calc(8*var(--px)) calc(13*var(--px)) var(--dress),
+        calc(9*var(--px)) calc(13*var(--px)) var(--dress),
+        calc(5*var(--px)) calc(14*var(--px)) var(--ol),
+        calc(6*var(--px)) calc(14*var(--px)) var(--dress2),
+        calc(7*var(--px)) calc(14*var(--px)) var(--dress2),
+        calc(8*var(--px)) calc(14*var(--px)) var(--dress2),
+        calc(9*var(--px)) calc(14*var(--px)) var(--dress2),
+        calc(10*var(--px)) calc(14*var(--px)) var(--ol),
+        /* 裙摆 */
+        calc(4*var(--px)) calc(15*var(--px)) var(--ol),
+        calc(5*var(--px)) calc(15*var(--px)) var(--dress),
+        calc(6*var(--px)) calc(15*var(--px)) var(--dress),
+        calc(7*var(--px)) calc(15*var(--px)) var(--dress),
+        calc(8*var(--px)) calc(15*var(--px)) var(--dress),
+        calc(9*var(--px)) calc(15*var(--px)) var(--dress),
+        calc(10*var(--px)) calc(15*var(--px)) var(--dress),
+        calc(11*var(--px)) calc(15*var(--px)) var(--ol),
+        /* 腿 */
+        calc(6*var(--px)) calc(16*var(--px)) var(--skin),
+        calc(9*var(--px)) calc(16*var(--px)) var(--skin),
+        calc(6*var(--px)) calc(17*var(--px)) var(--skin),
+        calc(9*var(--px)) calc(17*var(--px)) var(--skin),
+        /* 袜子 */
+        calc(6*var(--px)) calc(18*var(--px)) var(--sock),
+        calc(9*var(--px)) calc(18*var(--px)) var(--sock),
+        /* 鞋 */
+        calc(5*var(--px)) calc(19*var(--px)) var(--shoe),
+        calc(6*var(--px)) calc(19*var(--px)) var(--shoe),
+        calc(8*var(--px)) calc(19*var(--px)) var(--shoe),
+        calc(9*var(--px)) calc(19*var(--px)) var(--shoe),
+        calc(10*var(--px)) calc(19*var(--px)) var(--shoe);
+      background:transparent;
+    }
+
+    .name-tag{
+      background:rgba(255,255,255,.94);
+      border:2px solid #2a3540;
+      border-radius:10px;
+      padding:2px 9px;
+      font-size:12px;
+      font-weight:800;
+      white-space:nowrap;
+      box-shadow:var(--shadow);
+      pointer-events:none;
+    }
+
+    /* 专注：盘腿冥想精灵图（更大、更像点阵） */
+    .ac-sprite.ac-meditate{
+      --px: 7px;
+      width:calc(20 * var(--px));
+      height:calc(20 * var(--px));
+      filter:drop-shadow(0 10px 0 rgba(0,0,0,.10));
+      transform:scale(1.08);
+    }
+    .ac-sprite.ac-meditate::after{display:none;}
+    .ac-sprite.ac-meditate::before{
+      box-shadow:
+        /* 冥想（20x20）：头更大、闭眼、盘腿 */
+        calc(8*var(--px)) calc(1*var(--px)) var(--ol),
+        calc(9*var(--px)) calc(1*var(--px)) var(--ol),
+        calc(10*var(--px)) calc(1*var(--px)) var(--ol),
+        calc(7*var(--px)) calc(2*var(--px)) var(--ol),
+        calc(8*var(--px)) calc(2*var(--px)) var(--hair),
+        calc(9*var(--px)) calc(2*var(--px)) var(--hair),
+        calc(10*var(--px)) calc(2*var(--px)) var(--hair),
+        calc(11*var(--px)) calc(2*var(--px)) var(--ol),
+        calc(6*var(--px)) calc(3*var(--px)) var(--ol),
+        calc(7*var(--px)) calc(3*var(--px)) var(--hair),
+        calc(8*var(--px)) calc(3*var(--px)) var(--hair2),
+        calc(9*var(--px)) calc(3*var(--px)) var(--hair2),
+        calc(10*var(--px)) calc(3*var(--px)) var(--hair),
+        calc(11*var(--px)) calc(3*var(--px)) var(--hair),
+        calc(12*var(--px)) calc(3*var(--px)) var(--ol),
+        /* 脸 */
+        calc(7*var(--px)) calc(4*var(--px)) var(--ol),
+        calc(8*var(--px)) calc(4*var(--px)) var(--skin),
+        calc(9*var(--px)) calc(4*var(--px)) var(--skin),
+        calc(10*var(--px)) calc(4*var(--px)) var(--skin),
+        calc(11*var(--px)) calc(4*var(--px)) var(--ol),
+        calc(7*var(--px)) calc(5*var(--px)) var(--ol),
+        calc(8*var(--px)) calc(5*var(--px)) var(--skin),
+        calc(9*var(--px)) calc(5*var(--px)) var(--skin),
+        calc(10*var(--px)) calc(5*var(--px)) var(--skin),
+        calc(11*var(--px)) calc(5*var(--px)) var(--ol),
+        /* 闭眼 */
+        calc(8*var(--px)) calc(6*var(--px)) var(--ol),
+        calc(10*var(--px)) calc(6*var(--px)) var(--ol),
+        /* 腮红 */
+        calc(7*var(--px)) calc(7*var(--px)) var(--cheek),
+        calc(11*var(--px)) calc(7*var(--px)) var(--cheek),
+        /* 嘴 */
+        calc(9*var(--px)) calc(8*var(--px)) #c87878,
+        /* 身体 */
+        calc(7*var(--px)) calc(9*var(--px)) var(--ol),
+        calc(8*var(--px)) calc(9*var(--px)) var(--dress),
+        calc(9*var(--px)) calc(9*var(--px)) var(--dress),
+        calc(10*var(--px)) calc(9*var(--px)) var(--dress),
+        calc(11*var(--px)) calc(9*var(--px)) var(--ol),
+        calc(6*var(--px)) calc(10*var(--px)) var(--skin),
+        calc(12*var(--px)) calc(10*var(--px)) var(--skin),
+        calc(7*var(--px)) calc(10*var(--px)) var(--dress2),
+        calc(8*var(--px)) calc(10*var(--px)) var(--dress2),
+        calc(9*var(--px)) calc(10*var(--px)) var(--dress2),
+        calc(10*var(--px)) calc(10*var(--px)) var(--dress2),
+        calc(11*var(--px)) calc(10*var(--px)) var(--dress2),
+        /* 盘腿 */
+        calc(6*var(--px)) calc(12*var(--px)) var(--dress2),
+        calc(7*var(--px)) calc(12*var(--px)) var(--dress2),
+        calc(8*var(--px)) calc(12*var(--px)) var(--dress2),
+        calc(9*var(--px)) calc(12*var(--px)) var(--dress2),
+        calc(10*var(--px)) calc(12*var(--px)) var(--dress2),
+        calc(11*var(--px)) calc(12*var(--px)) var(--dress2),
+        calc(12*var(--px)) calc(12*var(--px)) var(--dress2),
+        calc(5*var(--px)) calc(13*var(--px)) var(--shoe),
+        calc(6*var(--px)) calc(13*var(--px)) var(--shoe),
+        calc(7*var(--px)) calc(13*var(--px)) var(--dress2),
+        calc(12*var(--px)) calc(13*var(--px)) var(--dress2),
+        calc(13*var(--px)) calc(13*var(--px)) var(--shoe),
+        calc(14*var(--px)) calc(13*var(--px)) var(--shoe);
+      background:transparent;
+    }
+    .scene-top{position:absolute;left:10px;top:10px;display:flex;gap:8px;align-items:center;}
+    .chip{
+      border:0;border-radius:10px;background:#fff;padding:6px 8px;font-size:12px;font-weight:700;color:#2e5578;box-shadow:var(--shadow);cursor:pointer;
+    }
+    .scene-bottom{
+      position:absolute;left:50%;bottom:16px;transform:translateX(-50%);
+      width:88%;
+    }
+    .btn{
+      width:100%;border:0;border-radius:12px;background:linear-gradient(180deg,#9dc8f0,#88B8E8);color:#fff;
+      font-weight:800;padding:11px;box-shadow:0 8px 16px rgba(136,184,232,.36);cursor:pointer;transition:.12s transform,.12s filter;
+    }
+    .level-box{
+      position:absolute;left:10px;right:10px;bottom:66px;background:rgba(255,255,255,.9);
+      border-radius:12px;padding:8px;border:2px solid rgba(136,184,232,.5);
+    }
+    .level-line{display:flex;justify-content:space-between;font-size:12px;color:#54708b;margin-bottom:5px;}
+    .tabs{
+      position:absolute;left:0;right:0;bottom:0;height:74px;background:#fff;
+      border-top:2px solid rgba(136,184,232,.45);display:grid;grid-template-columns:repeat(4,1fr);padding:6px;
+    }
+    .tab{
+      border:0;background:transparent;border-radius:12px;color:#6c7d8e;font-weight:700;font-size:12px;cursor:pointer;transition:.12s transform,.12s filter;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+    }
+    .tab.active{background:#eaf4ff;color:#2d6497;}
+    .tab i{font-style:normal;font-size:18px;line-height:1;}
+    .task-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+    .task-item{border:2px dashed rgba(136,184,232,.45);border-radius:14px;padding:10px;margin-bottom:8px;background:#fff;}
+    .task-item.special-orange{background:#fff7ea;border-color:rgba(248,194,123,.55);}
+    .task-item.special-pink{background:#fff1f7;border-color:rgba(244,182,208,.62);}
+    .task-row{display:flex;align-items:center;gap:8px;}
+    .task-name{font-size:13px;font-weight:700;flex:1;}
+    .task-sub{font-size:11px;color:#d17c5f;margin-top:5px;}
+    .task-sub.pink{color:#bf6c8f;}
+    .mini-btn{
+      border:0;background:#edf5ff;color:#2e5e8b;border-radius:9px;padding:6px 8px;font-size:12px;font-weight:700;cursor:pointer;
+    }
+    .system-check{
+      width:20px;height:20px;border-radius:7px;border:2px solid #3b4c5f;display:grid;place-items:center;font-size:13px;font-weight:900;
+      background:#fff;cursor:pointer;
+    }
+    .system-check.done{background:#7cc895;color:#fff;border-color:#5e9a74;}
+    .reward-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+    .gift-box{
+      border-radius:12px;padding:10px;border:2px solid #d3d8df;background:#f4f6f8;color:#7f8892;text-align:center;
+    }
+    .gift-box.on{background:linear-gradient(180deg,#ffe9b7,#ffd87e);border-color:#efb34c;color:#644005;}
+    .gift-box button{margin-top:6px;width:100%;}
+    .custom-row{display:flex;gap:8px;align-items:center;}
+    .custom-check{
+      width:20px;height:20px;border-radius:6px;border:2px solid #3b4c5f;display:grid;place-items:center;cursor:pointer;background:#fff;
+    }
+    .custom-check.done{background:#88B8E8;color:#fff;}
+    .edit-tools{display:flex;gap:8px;margin:8px 0;}
+    .input{
+      width:100%;padding:10px;border-radius:10px;border:2px solid rgba(136,184,232,.45);outline:none;background:#fff;font-size:13px;
+    }
+    .ach-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+    .ach-item{
+      text-align:center;padding:10px;border-radius:14px;border:2px solid rgba(136,184,232,.4);background:#fff;cursor:pointer;
+    }
+    .ach-item.locked{filter:grayscale(1);opacity:.8;}
+    .ach-icon{width:50px;height:50px;border-radius:50%;display:grid;place-items:center;margin:0 auto 6px;font-size:23px;background:#eaf4ff;border:2px solid #7aa8d8;}
+    .calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;}
+    .week{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;font-size:11px;color:var(--muted);text-align:center;margin-bottom:6px;}
+    .day{
+      min-height:47px;background:#fff;border:1px solid rgba(136,184,232,.4);border-radius:10px;padding:3px;text-align:center;font-size:11px;cursor:pointer;
+      display:flex;flex-direction:column;justify-content:space-between;
+    }
+    .day.today{border-color:#f1a9c8;box-shadow:0 0 0 2px rgba(241,169,200,.24);}
+    .mark{font-size:12px;}
+    .bag-panel{
+      position:absolute;inset:0;background:#eff7ff;z-index:20;padding:12px 12px 84px;display:none;
+    }
+    .bag-panel.show{display:block;}
+    .bag-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+    .seg{display:flex;background:#deecfb;padding:4px;border-radius:12px;gap:4px;}
+    .seg button{border:0;background:transparent;border-radius:9px;padding:8px 12px;font-weight:700;color:#4d6782;cursor:pointer;}
+    .seg button.active{background:#fff;color:#2f5f8e;}
+    .item-row{border:2px dashed rgba(136,184,232,.5);border-radius:14px;background:#fff;padding:10px;margin-bottom:8px;}
+    .item-row.owned{border-style:solid;background:#eef9f1;border-color:rgba(124,200,149,.52);}
+    .item-title{font-weight:800;font-size:13px;margin-bottom:4px;}
+    .actions{display:flex;gap:6px;flex-wrap:wrap;}
+    .focus-layer{
+      position:absolute;inset:0;z-index:40;display:none;
+      background:linear-gradient(180deg,#bee3ff,#d7edff 38%,#8bce80 39%,#6abf62);
+      padding:16px;
+    }
+    .focus-layer.show{display:block;}
+    .ring-wrap{
+      position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+      width:230px;height:230px;
+    }
+    .focus-time{
+      position:absolute;left:50%;top:67%;transform:translateX(-50%);font-weight:800;font-size:20px;color:#1f4e7b;text-shadow:0 2px 0 rgba(255,255,255,.55);
+    }
+    .focus-end{
+      position:absolute;left:16px;right:16px;bottom:20px;
+    }
+    .modal-mask{
+      position:absolute;inset:0;background:rgba(22,31,42,.45);display:none;align-items:center;justify-content:center;padding:16px;z-index:60;
+    }
+    .modal-mask.show{display:flex;}
+    .modal{
+      width:min(100%,340px);background:#fff;border:3px solid #304155;border-radius:18px;padding:14px;text-align:center;
+      box-shadow:0 14px 25px rgba(0,0,0,.24);
+    }
+    .modal h4{margin:2px 0 8px;font-size:16px;}
+    .modal p{margin:0;color:#5f6f7f;font-size:13px;white-space:pre-line;}
+    .modal .btn{margin-top:10px;}
+  </style>
+</head>
+<body>
+  <div class="app" id="app">
+    <div class="topbar" id="topbar">
+      <div class="brand">🌿 FOOTPRINTS 像素成长</div>
+      <button class="icon-btn" id="bagBtn">🎒 背包</button>
+    </div>
+
+    <div class="content">
+      <section class="page active" id="homePage">
+        <div class="scene" id="sceneView">
+          <div class="sun"></div>
+          <div class="cloud" style="left:18px;top:30px;"></div>
+          <div class="cloud" style="left:98px;top:58px;transform:scale(.8);"></div>
+          <div class="scene-top">
+            <div class="chip">☀️ 晴天·白天</div>
+            <div class="chip" id="xpChip">Lv.3 · 120/200</div>
+          </div>
+          <div class="avatar-wrap" id="homeAvatar">
+            <div class="ac-sprite ac-stand" aria-label="viya sprite"></div>
+            <div class="name-tag">viya</div>
+          </div>
+          <div class="flowers"></div>
+          <div class="level-box">
+            <div class="level-line"><span>成长经验</span><span id="xpText">120/200</span></div>
+            <div class="bar"><div class="fill" id="xpBar"></div></div>
+          </div>
+          <div class="scene-bottom">
+            <button class="btn" id="focusBtn">进入自律时钟（30分钟）</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="page" id="taskPage">
+        <div class="card">
+          <div class="task-head">
+            <h3 class="title" style="margin:0;">系统自动检测任务</h3>
+            <button class="mini-btn" id="editToggleBtn">编辑</button>
+          </div>
+          <div id="systemTaskList"></div>
+
+          <div class="reward-row">
+            <div class="gift-box" id="smallGift">
+              <div>🎁 小礼盒（2个系统任务）</div>
+              <button class="mini-btn" id="smallGiftBtn" disabled>未点亮</button>
+            </div>
+            <div class="gift-box" id="bigGift">
+              <div>🎁 大礼盒（4个系统任务）</div>
+              <button class="mini-btn" id="bigGiftBtn" disabled>未点亮</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 class="title">自定义任务（仅经验）</h3>
+          <div id="editPanel" class="hidden">
+            <div class="edit-tools">
+              <input id="newTaskInput" class="input" placeholder="输入新任务名称，例如：背诵20分钟" />
+              <button class="mini-btn" id="addTaskBtn">添加</button>
+            </div>
+          </div>
+          <div id="customTaskList"></div>
+        </div>
+
+        <div class="card">
+          <h3 class="title">成就联动提示</h3>
+          <p class="tiny">灰色未解锁成就可点击查看条件，并一键加入我的任务。</p>
+          <div class="ach-grid" id="taskAchGrid"></div>
+        </div>
+      </section>
+
+      <section class="page" id="calendarPage">
+        <div class="card">
+          <h3 class="title">月视图日历</h3>
+          <p class="tiny" id="monthLabel"></p>
+          <div class="week"><div>日</div><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div></div>
+          <div class="calendar-grid" id="calendarGrid"></div>
+          <p class="tiny" id="streakText">连续打卡：0天</p>
+        </div>
+        <div class="card">
+          <h3 class="title">今日事项</h3>
+          <div style="display:flex;gap:8px;">
+            <input id="eventInput" class="input" placeholder="添加今日事项..." />
+            <button id="eventAddBtn" class="mini-btn">添加</button>
+          </div>
+          <div id="eventList" style="margin-top:8px;"></div>
+        </div>
+      </section>
+
+      <section class="page" id="profilePage">
+        <div class="card">
+          <h3 class="title">成就展览柜</h3>
+          <div class="ach-grid" id="profileAchGrid"></div>
+          <button class="btn" id="shareAllBtn" style="margin-top:10px;">一键分享展览柜（朋友圈/小红书）</button>
+        </div>
+      </section>
+    </div>
+
+    <nav class="tabs" id="tabs">
+      <button class="tab active" data-page="home"><i>🏠</i>首页</button>
+      <button class="tab" data-page="task"><i>✅</i>任务</button>
+      <button class="tab" data-page="calendar"><i>🗓️</i>日历</button>
+      <button class="tab" data-page="profile"><i>🙋‍♀️</i>我的</button>
+    </nav>
+
+    <div class="bag-panel" id="bagPanel">
+      <div class="bag-top">
+        <h3 class="title" style="margin:0;">🎒 背包</h3>
+        <button class="mini-btn" id="bagCloseBtn">关闭</button>
+      </div>
+      <div class="seg">
+        <button class="active" id="wardrobeTabBtn">衣柜</button>
+        <button id="sceneTabBtn">场景</button>
+      </div>
+      <div id="wardrobePanel" style="margin-top:10px;"></div>
+      <div id="scenePanel" class="hidden" style="margin-top:10px;"></div>
+    </div>
+
+    <div class="focus-layer" id="focusLayer">
+      <div class="cloud" style="left:18px;top:28px;"></div>
+      <div class="cloud" style="right:30px;top:55px;transform:scale(.9);"></div>
+      <div class="ring-wrap">
+        <svg width="230" height="230" viewBox="0 0 230 230">
+          <circle cx="115" cy="115" r="92" stroke="rgba(255,255,255,.55)" stroke-width="14" fill="none"></circle>
+          <circle id="focusRing" cx="115" cy="115" r="92" stroke="#88B8E8" stroke-width="14" fill="none" stroke-linecap="round"
+                  transform="rotate(-90 115 115)" stroke-dasharray="578" stroke-dashoffset="0"></circle>
+        </svg>
+      </div>
+      <div class="focus-avatar-wrap">
+        <div class="ac-sprite ac-meditate" aria-label="viya meditate sprite"></div>
+      </div>
+      <div class="focus-time" id="focusTime">30:00</div>
+      <div class="focus-end"><button class="btn" id="focusEndBtn">结束专注</button></div>
+    </div>
+
+    <div class="modal-mask" id="modalMask">
+      <div class="modal">
+        <h4 id="modalTitle">提示</h4>
+        <p id="modalDesc"></p>
+        <button class="btn" id="modalOkBtn">知道啦</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const state = {
+      user:{ name:"viya", level:3, xp:120, xpMax:200, shards:6, weather:"晴天·白天", outfit:"森林校服", scene:"花海" },
+      firstGiftShown:false,
+      systemTasks:[
+        {id:"gre",name:"学习GRE单词100个",current:0,total:100,done:false,type:"progress"},
+        {id:"steps",name:"运动步数5000步",current:2800,total:5000,done:false,type:"progress",tip:"快完成了，加油"},
+        {id:"sleep",name:"12点前睡觉",status:"今日未完成",done:false,type:"status",special:"pink",streak:"已坚持25天，不要断签哦"},
+        {id:"bili",name:"完成B站跟练视频",status:"待跟练",done:false,type:"link",special:"orange",streak:"已坚持25天，不要断签哦"}
+      ],
+      smallGiftClaimed:false,
+      bigGiftClaimed:false,
+      customTasks:[
+        {id:1,name:"阅读30分钟",progress:60,done:false,exp:5},
+        {id:2,name:"整理书桌",progress:100,done:true,exp:4}
+      ],
+      editMode:false,
+      achievements:[
+        {id:"a1",name:"天鹅颈卷王",desc:"完成30天天鹅颈跟练打卡",icon:"🦢",unlocked:true},
+        {id:"a2",name:"早睡结界师",desc:"连续27天12点前睡觉",icon:"🌙",unlocked:true},
+        {id:"a3",name:"步行冒险家",desc:"连续15天步数达到5000",icon:"👟",unlocked:false,condition:"连续15天步数达到5000"},
+        {id:"a4",name:"学习点灯人",desc:"连续20天学习GRE 100词",icon:"📚",unlocked:false,condition:"连续20天完成GRE单词100个"}
+      ],
+      calendarChecks:new Set(),
+      events:[],
+      bag:{
+        wardrobe:[
+          {id:"w1",name:"森林校服",owned:true,equipped:true,preview:"清新绿色系"},
+          {id:"w2",name:"星空斗篷",owned:false,fragments:6,need:10,preview:"夜空蓝闪光风"},
+          {id:"w3",name:"樱花和服",owned:false,fragments:10,need:10,preview:"粉白花瓣风"}
+        ],
+        scenes:[
+          {id:"s1",name:"花海",owned:true,equipped:true,preview:"默认晴天花海"},
+          {id:"s2",name:"草地露营",owned:false,fragments:8,need:10,preview:"草地与帐篷"},
+          {id:"s3",name:"海边晨光",owned:false,fragments:10,need:10,preview:"海边金色晨曦"}
+        ],
+        tab:"wardrobe"
+      },
+      focus:{
+        active:false,
+        totalSec:1800,
+        remainSec:1800,
+        timer:null
+      }
+    };
+
+    const $ = (id) => document.getElementById(id);
+    const pages = { home:$("homePage"), task:$("taskPage"), calendar:$("calendarPage"), profile:$("profilePage") };
+
+    function openModal(title,desc,okText="知道啦"){
+      $("modalTitle").textContent=title;
+      $("modalDesc").textContent=desc;
+      $("modalOkBtn").textContent=okText;
+      $("modalMask").classList.add("show");
+    }
+    function closeModal(){ $("modalMask").classList.remove("show"); }
+    $("modalOkBtn").onclick=closeModal;
+    $("modalMask").onclick=(e)=>{ if(e.target.id==="modalMask") closeModal(); };
+
+    function gainXp(v){
+      state.user.xp += v;
+      while(state.user.xp >= state.user.xpMax){
+        state.user.xp -= state.user.xpMax;
+        state.user.level += 1;
+      }
+      renderUser();
+    }
+
+    function renderUser(){
+      const p = Math.max(0,Math.min(100,(state.user.xp/state.user.xpMax)*100));
+      $("xpBar").style.width = p + "%";
+      $("xpText").textContent = `${state.user.xp}/${state.user.xpMax}`;
+      $("xpChip").textContent = `Lv.${state.user.level} · ${state.user.xp}/${state.user.xpMax}`;
+      document.querySelector(".scene-top .chip").textContent = `☀️ ${state.user.weather}`;
+    }
+
+    function switchPage(key){
+      Object.values(pages).forEach(p=>p.classList.remove("active"));
+      pages[key].classList.add("active");
+      document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("active",t.dataset.page===key));
+    }
+    document.querySelectorAll(".tab").forEach(tab=>tab.onclick=()=>switchPage(tab.dataset.page));
+
+    function systemDoneCount(){ return state.systemTasks.filter(t=>t.done).length; }
+
+    function updateRewardState(){
+      const done = systemDoneCount();
+      const smallOn = done >= 2 && !state.smallGiftClaimed;
+      const bigOn = done >= 4 && !state.bigGiftClaimed;
+      $("smallGift").classList.toggle("on",smallOn);
+      $("bigGift").classList.toggle("on",bigOn);
+      $("smallGiftBtn").disabled=!smallOn;
+      $("bigGiftBtn").disabled=!bigOn;
+      $("smallGiftBtn").textContent = state.smallGiftClaimed ? "已领取" : smallOn ? "领取奖励" : "未点亮";
+      $("bigGiftBtn").textContent = state.bigGiftClaimed ? "已领取" : bigOn ? "领取奖励" : "未点亮";
+    }
+
+    function rewardClaim(type){
+      const exp = type==="small" ? 10 : 18;
+      const frag = Math.floor(Math.random()*3)+1;
+      if(type==="small") state.smallGiftClaimed=true;
+      if(type==="big") state.bigGiftClaimed=true;
+      state.user.shards += frag;
+      gainXp(exp);
+      updateRewardState();
+      renderBag();
+      openModal("礼盒奖励到账",`经验 +${exp}\n皮肤碎片 +${frag}`);
+    }
+
+    $("smallGiftBtn").onclick=()=>{ if(!$("smallGiftBtn").disabled) rewardClaim("small"); };
+    $("bigGiftBtn").onclick=()=>{ if(!$("bigGiftBtn").disabled) rewardClaim("big"); };
+
+    function renderSystemTasks(){
+      const box = $("systemTaskList");
+      box.innerHTML = "";
+      state.systemTasks.forEach(task=>{
+        const div = document.createElement("div");
+        let cls = "task-item";
+        if(task.special==="orange") cls += " special-orange";
+        if(task.special==="pink") cls += " special-pink";
+        div.className = cls;
+
+        let rightPart = "";
+        let progressLine = "";
+
+        if(task.type==="progress"){
+          const pct = Math.min(100,(task.current/task.total)*100);
+          progressLine = `<div class="tiny" style="margin:6px 0 4px;">${task.current}/${task.total}</div>
+                          <div class="bar"><div class="fill" style="width:${pct}%;"></div></div>`;
+          if(task.tip) progressLine += `<div class="task-sub">${task.tip}</div>`;
+        } else if(task.type==="status"){
+          progressLine = `<div class="tiny" style="margin-top:6px;">${task.status}</div>`;
+        } else {
+          rightPart = `<button class="mini-btn" data-go="${task.id}">去跟练</button>`;
+          progressLine = `<div class="tiny" style="margin-top:6px;">${task.status}</div>`;
+        }
+
+        if(task.streak){
+          progressLine += `<div class="task-sub ${task.special==="pink"?"pink":""}">${task.streak}</div>`;
+        }
+
+        div.innerHTML = `
+          <div class="task-row">
+            <div class="system-check ${task.done?"done":""}" data-sys="${task.id}">${task.done?"✓":""}</div>
+            <div class="task-name">${task.name}</div>
+            ${rightPart}
+          </div>
+          ${progressLine}
+        `;
+        box.appendChild(div);
+      });
+
+      box.querySelectorAll("[data-go]").forEach(btn=>{
+        btn.onclick=()=>{
+          openModal("Demo跳转", "已跳转到跟练Demo页（模拟）");
+          const t = state.systemTasks.find(i=>i.id==="bili");
+          t.status = "已完成";
+          t.done = true;
+          renderSystemTasks();
+        };
+      });
+      box.querySelectorAll("[data-sys]").forEach(check=>{
+        check.onclick=()=>{
+          const id = check.dataset.sys;
+          const t = state.systemTasks.find(i=>i.id===id);
+          t.done = !t.done;
+          if(t.type==="status") t.status = t.done ? "今日已完成" : "今日未完成";
+          if(t.type==="progress" && t.done) t.current = t.total;
+          if(t.type==="progress" && !t.done && t.id==="gre") t.current = 0;
+          if(t.type==="progress" && !t.done && t.id==="steps") t.current = 2800;
+          renderSystemTasks();
+        };
+      });
+      updateRewardState();
+    }
+
+    function renderCustomTasks(){
+      const box = $("customTaskList");
+      box.innerHTML = "";
+      state.customTasks.forEach(task=>{
+        const row = document.createElement("div");
+        row.className = "task-item";
+        row.innerHTML = `
+          <div class="custom-row">
+            <div class="custom-check ${task.done?"done":""}" data-custom="${task.id}">${task.done?"✓":""}</div>
+            <div class="task-name">${task.name}</div>
+            <div class="tiny">+${task.exp}经验</div>
+            ${state.editMode ? `<button class="mini-btn" data-del="${task.id}">删除</button>` : ""}
+          </div>
+          <div class="tiny" style="margin:6px 0 4px;">进度 ${task.progress}%</div>
+          <div class="bar"><div class="fill" style="width:${task.progress}%"></div></div>
+        `;
+        box.appendChild(row);
+      });
+
+      box.querySelectorAll("[data-custom]").forEach(c=>{
+        c.onclick=()=>{
+          const id = Number(c.dataset.custom);
+          const t = state.customTasks.find(i=>i.id===id);
+          t.done = !t.done;
+          t.progress = t.done ? 100 : Math.min(t.progress,80);
+          if(t.done) gainXp(t.exp);
+          renderCustomTasks();
+        };
+      });
+
+      box.querySelectorAll("[data-del]").forEach(b=>{
+        b.onclick=()=>{
+          const id = Number(b.dataset.del);
+          state.customTasks = state.customTasks.filter(i=>i.id!==id);
+          renderCustomTasks();
+        };
+      });
+    }
+
+    $("editToggleBtn").onclick=()=>{
+      state.editMode = !state.editMode;
+      $("editPanel").classList.toggle("hidden", !state.editMode);
+      $("editToggleBtn").textContent = state.editMode ? "完成编辑" : "编辑";
+      renderCustomTasks();
+    };
+    $("addTaskBtn").onclick=()=>{
+      const text = $("newTaskInput").value.trim();
+      if(!text) return;
+      state.customTasks.push({id:Date.now(),name:text,progress:0,done:false,exp:5});
+      $("newTaskInput").value = "";
+      renderCustomTasks();
+    };
+
+    function renderTaskAchievementLink(){
+      const box = $("taskAchGrid");
+      box.innerHTML = "";
+      state.achievements.forEach(a=>{
+        const d = document.createElement("div");
+        d.className = "ach-item" + (a.unlocked ? "" : " locked");
+        d.innerHTML = `<div class="ach-icon">${a.unlocked ? a.icon : "🔒"}</div><div class="tiny">${a.name}</div>`;
+        d.onclick=()=>{
+          if(a.unlocked){
+            openModal("已解锁成就", `${a.name}\n${a.desc}`);
+          }else{
+            openModal("未解锁成就", `达成条件：${a.condition}\n\n点击“添加”将条件任务加入自定义任务`, "一键添加");
+            $("modalOkBtn").onclick=()=>{
+              closeModal();
+              state.customTasks.push({id:Date.now(),name:`[成就] ${a.condition}`,progress:0,done:false,exp:8});
+              renderCustomTasks();
+              $("modalOkBtn").onclick=defaultModalOk;
+            };
+          }
+        };
+        box.appendChild(d);
+      });
+    }
+
+    function renderProfileAchievements(){
+      const box = $("profileAchGrid");
+      box.innerHTML = "";
+      state.achievements.forEach(a=>{
+        const d = document.createElement("div");
+        d.className = "ach-item" + (a.unlocked ? "" : " locked");
+        d.innerHTML = `
+          <div class="ach-icon">${a.unlocked ? a.icon : "🔒"}</div>
+          <div style="font-size:12px;font-weight:700;">${a.name}</div>
+          <div class="tiny">${a.desc}</div>
+        `;
+        d.onclick=()=>{
+          if(a.unlocked){
+            openModal("分享卡片已生成", `【${a.name}】\n准备分享到朋友圈/小红书（模拟）`);
+          }else{
+            openModal("成就未解锁", `达成条件：${a.condition}`);
+          }
+        };
+        box.appendChild(d);
+      });
+    }
+    $("shareAllBtn").onclick=()=>openModal("展览柜分享", "已生成成就展览柜总览分享卡片（模拟）");
+
+    function renderCalendar(){
+      const now = new Date();
+      const y = now.getFullYear(), m = now.getMonth();
+      $("monthLabel").textContent = `${y}年${m+1}月`;
+      const first = new Date(y,m,1).getDay();
+      const days = new Date(y,m+1,0).getDate();
+      const prevDays = new Date(y,m,0).getDate();
+      const box = $("calendarGrid");
+      box.innerHTML = "";
+
+      const tags = {
+        [`${y}-${m+1}-9`]:"🎂A",
+        [`${y}-${m+1}-18`]:"🎉"
+      };
+      for(let i=0;i<42;i++){
+        const d = document.createElement("div");
+        d.className = "day";
+        let day, other = false;
+        if(i<first){ day = prevDays-first+i+1; other=true; }
+        else if(i>=first+days){ day = i-first-days+1; other=true; }
+        else day=i-first+1;
+
+        const key = `${y}-${m+1}-${day}`;
+        const checked = state.calendarChecks.has(key);
+        const isToday = !other && day===now.getDate();
+        if(isToday) d.classList.add("today");
+        if(other) d.style.opacity=".35";
+        d.innerHTML = `<div>${day}</div><div class="mark">${checked?"💙":"▫️"}</div><div style="font-size:10px;color:#d87f7f;">${tags[key]||""}</div>`;
+        if(!other){
+          d.onclick=()=>{
+            if(state.calendarChecks.has(key)) state.calendarChecks.delete(key);
+            else state.calendarChecks.add(key);
+            renderCalendar();
+          };
+        }
+        box.appendChild(d);
+      }
+
+      let streak = 0;
+      const cursor = new Date();
+      while(true){
+        const k = `${cursor.getFullYear()}-${cursor.getMonth()+1}-${cursor.getDate()}`;
+        if(state.calendarChecks.has(k)){ streak++; cursor.setDate(cursor.getDate()-1); }
+        else break;
+      }
+      $("streakText").textContent = `连续打卡：${streak}天 · 节假日标注已显示`;
+    }
+
+    $("eventAddBtn").onclick=()=>{
+      const t = $("eventInput").value.trim();
+      if(!t) return;
+      state.events.push(t);
+      $("eventInput").value="";
+      renderEvents();
+    };
+    function renderEvents(){
+      $("eventList").innerHTML = state.events.map(e=>`<div class="task-item tiny">📝 ${e}</div>`).join("");
+    }
+
+    function renderBag(){
+      renderWardrobe();
+      renderSceneBag();
+      applySceneVisual();
+    }
+
+    function renderWardrobe(){
+      const box = $("wardrobePanel");
+      box.innerHTML = "";
+      state.bag.wardrobe.forEach(item=>{
+        const canClaim = !item.owned && item.fragments>=item.need;
+        const div = document.createElement("div");
+        div.className = "item-row " + (item.owned ? "owned" : "");
+        div.innerHTML = `
+          <div class="item-title">👗 ${item.name} ${item.equipped?"（已穿戴）":""}</div>
+          <div class="tiny">${item.preview}</div>
+          <div class="tiny" style="margin-top:5px;">${item.owned ? "已拥有，可点击穿戴" : `碎片 ${item.fragments}/${item.need}`}</div>
+          <div class="actions" style="margin-top:8px;">
+            <button class="mini-btn" data-preview-w="${item.id}">预览</button>
+            ${item.owned ? `<button class="mini-btn" data-equip-w="${item.id}">穿戴</button>` :
+            `<button class="mini-btn" data-go-task="1">去完成</button>${canClaim?`<button class="mini-btn" data-claim-w="${item.id}">领取</button>`:""}`}
+          </div>
+        `;
+        box.appendChild(div);
+      });
+
+      box.querySelectorAll("[data-preview-w]").forEach(b=>{
+        b.onclick=()=>openModal("衣服预览", "已切换预览效果（模拟）");
+      });
+      box.querySelectorAll("[data-go-task]").forEach(b=>{
+        b.onclick=()=>{ $("bagPanel").classList.remove("show"); switchPage("task"); };
+      });
+      box.querySelectorAll("[data-claim-w]").forEach(b=>{
+        b.onclick=()=>{
+          const id = b.dataset.claimW;
+          const i = state.bag.wardrobe.find(x=>x.id===id);
+          i.owned = true; i.equipped=false;
+          openModal("领取成功", `${i.name} 已加入衣柜`);
+          renderWardrobe();
+        };
+      });
+      box.querySelectorAll("[data-equip-w]").forEach(b=>{
+        b.onclick=()=>{
+          const id = b.dataset.equipW;
+          state.bag.wardrobe.forEach(i=>i.equipped=false);
+          const i = state.bag.wardrobe.find(x=>x.id===id);
+          i.equipped = true;
+          state.user.outfit = i.name;
+          openModal("穿戴成功", `当前穿戴：${i.name}`);
+          renderWardrobe();
+        };
+      });
+    }
+
+    function renderSceneBag(){
+      const box = $("scenePanel");
+      box.innerHTML = "";
+      state.bag.scenes.forEach(item=>{
+        const canClaim = !item.owned && item.fragments>=item.need;
+        const div = document.createElement("div");
+        div.className = "item-row " + (item.owned ? "owned" : "");
+        div.innerHTML = `
+          <div class="item-title">🌄 ${item.name} ${item.equipped?"（已使用）":""}</div>
+          <div class="tiny">${item.preview}</div>
+          <div class="tiny" style="margin-top:5px;">${item.owned ? "已拥有，可点击切换" : `碎片 ${item.fragments}/${item.need}`}</div>
+          <div class="actions" style="margin-top:8px;">
+            <button class="mini-btn" data-preview-s="${item.id}">预览</button>
+            ${item.owned ? `<button class="mini-btn" data-equip-s="${item.id}">切换场景</button>` :
+            `<button class="mini-btn" data-go-task="1">去完成</button>${canClaim?`<button class="mini-btn" data-claim-s="${item.id}">领取</button>`:""}`}
+          </div>
+        `;
+        box.appendChild(div);
+      });
+
+      box.querySelectorAll("[data-preview-s]").forEach(b=>{
+        b.onclick=()=>openModal("场景预览", "已展示场景预览（模拟）");
+      });
+      box.querySelectorAll("[data-claim-s]").forEach(b=>{
+        b.onclick=()=>{
+          const id = b.dataset.claimS;
+          const i = state.bag.scenes.find(x=>x.id===id);
+          i.owned = true;
+          openModal("领取成功", `${i.name} 已加入场景库`);
+          renderSceneBag();
+        };
+      });
+      box.querySelectorAll("[data-equip-s]").forEach(b=>{
+        b.onclick=()=>{
+          const id = b.dataset.equipS;
+          state.bag.scenes.forEach(i=>i.equipped=false);
+          const i = state.bag.scenes.find(x=>x.id===id);
+          i.equipped=true;
+          state.user.scene = i.name;
+          applySceneVisual();
+          openModal("场景切换成功", `当前场景：${i.name}`);
+          renderSceneBag();
+        };
+      });
+      box.querySelectorAll("[data-go-task]").forEach(b=>{
+        b.onclick=()=>{ $("bagPanel").classList.remove("show"); switchPage("task"); };
+      });
+    }
+
+    function applySceneVisual(){
+      const s = state.user.scene;
+      const scene = $("sceneView");
+      if(s==="花海"){
+        scene.style.background = "linear-gradient(180deg,#bfe4ff 0%,#d8edff 38%,#9ad08f 39%,#7ac36f 100%)";
+      }else if(s==="草地露营"){
+        scene.style.background = "linear-gradient(180deg,#c8e6ff 0%,#dff1ff 40%,#8fcb80 41%,#6bb55d 100%)";
+      }else{
+        scene.style.background = "linear-gradient(180deg,#ffe6b8 0%,#ffdba4 35%,#8dcf91 36%,#70be68 100%)";
+      }
+    }
+
+    $("bagBtn").onclick=()=>{ $("bagPanel").classList.add("show"); };
+    $("bagCloseBtn").onclick=()=>{ $("bagPanel").classList.remove("show"); };
+    $("wardrobeTabBtn").onclick=()=>{
+      state.bag.tab="wardrobe";
+      $("wardrobePanel").classList.remove("hidden");
+      $("scenePanel").classList.add("hidden");
+      $("wardrobeTabBtn").classList.add("active");
+      $("sceneTabBtn").classList.remove("active");
+    };
+    $("sceneTabBtn").onclick=()=>{
+      state.bag.tab="scene";
+      $("scenePanel").classList.remove("hidden");
+      $("wardrobePanel").classList.add("hidden");
+      $("sceneTabBtn").classList.add("active");
+      $("wardrobeTabBtn").classList.remove("active");
+    };
+
+    function formatMMSS(s){
+      const m = Math.floor(s/60).toString().padStart(2,"0");
+      const sec = (s%60).toString().padStart(2,"0");
+      return `${m}:${sec}`;
+    }
+
+    function enterFocus(){
+      state.focus.active = true;
+      state.focus.remainSec = state.focus.totalSec;
+      $("focusLayer").classList.add("show");
+      $("topbar").classList.add("hidden");
+      $("tabs").classList.add("hidden");
+      $("bagBtn").classList.add("hidden");
+      updateFocusUI();
+      if(state.focus.timer) clearInterval(state.focus.timer);
+      state.focus.timer = setInterval(()=>{
+        state.focus.remainSec -= 1;
+        updateFocusUI();
+        if(state.focus.remainSec<=0){
+          clearInterval(state.focus.timer);
+          state.focus.timer=null;
+          gainXp(20);
+          openModal("专注完成", "30分钟专注完成，经验 +20");
+          exitFocus();
+        }
+      },1000);
+    }
+
+    function updateFocusUI(){
+      $("focusTime").textContent = formatMMSS(Math.max(0,state.focus.remainSec));
+      const total = 578;
+      const pct = state.focus.remainSec/state.focus.totalSec;
+      $("focusRing").style.strokeDashoffset = total*(1-pct);
+    }
+
+    function exitFocus(){
+      state.focus.active=false;
+      $("focusLayer").classList.remove("show");
+      $("topbar").classList.remove("hidden");
+      $("tabs").classList.remove("hidden");
+      $("bagBtn").classList.remove("hidden");
+      if(state.focus.timer){ clearInterval(state.focus.timer); state.focus.timer=null; }
+      switchPage("home");
+    }
+
+    $("focusBtn").onclick=enterFocus;
+    $("focusEndBtn").onclick=exitFocus;
+
+    const defaultModalOk = closeModal;
+    function showDailyGift(){
+      if(state.firstGiftShown) return;
+      state.firstGiftShown=true;
+      const xp = Math.floor(Math.random()*5)+3;
+      const frag = Math.floor(Math.random()*2)+1;
+      gainXp(xp);
+      state.user.shards += frag;
+      openModal("每日登录礼盒", `欢迎回来，viya！\n获得经验 +${xp}\n皮肤碎片 +${frag}`);
+    }
+
+    function init(){
+      renderUser();
+      renderSystemTasks();
+      renderCustomTasks();
+      renderTaskAchievementLink();
+      renderProfileAchievements();
+      renderCalendar();
+      renderEvents();
+      renderBag();
+      setTimeout(showDailyGift,300);
+    }
+    init();
+  </script>
+</body>
+</html>
